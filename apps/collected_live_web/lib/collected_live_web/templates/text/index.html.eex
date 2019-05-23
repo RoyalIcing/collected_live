@@ -1,0 +1,24 @@
+<h1>Listing Content</h1>
+
+<table>
+  <thead>
+    <tr>
+
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+<%= for text <- @content do %>
+    <tr>
+
+      <td>
+        <%= link "Show", to: Routes.text_path(@conn, :show, text) %>
+        <%= link "Edit", to: Routes.text_path(@conn, :edit, text) %>
+        <%= link "Delete", to: Routes.text_path(@conn, :delete, text), method: :delete, data: [confirm: "Are you sure?"] %>
+      </td>
+    </tr>
+<% end %>
+  </tbody>
+</table>
+
+<span><%= link "New Text", to: Routes.text_path(@conn, :new) %></span>

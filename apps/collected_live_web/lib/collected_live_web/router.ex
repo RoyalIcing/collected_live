@@ -17,6 +17,7 @@ defmodule CollectedLiveWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :index
+    resources "/text", TextController
   end
 
   # Other scopes may use custom stacks.

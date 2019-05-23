@@ -24,7 +24,7 @@ defmodule CollectedLiveWeb.MixProject do
   def application do
     [
       mod: {CollectedLiveWeb.Application, []},
-      extra_applications: [:logger, :runtime_tools]
+      extra_applications: [:logger, :runtime_tools, :phoenix_ecto]
     ]
   end
 
@@ -40,6 +40,7 @@ defmodule CollectedLiveWeb.MixProject do
       {:phoenix, "~> 1.4.6"},
       {:phoenix_pubsub, "~> 1.1"},
       {:phoenix_html, "~> 2.11"},
+      {:phoenix_ecto, "~> 4.0"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
       {:gettext, "~> 0.11"},
       {:collected_live, in_umbrella: true},

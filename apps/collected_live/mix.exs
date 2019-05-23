@@ -35,7 +35,9 @@ defmodule CollectedLive.MixProject do
   #
   # Type `mix help deps` for examples and options.
   defp deps do
-    []
+    [
+      {:ecto, "~> 3.1.4"}
+    ]
   end
 
   # Aliases are shortcuts or tasks specific to the current project.
