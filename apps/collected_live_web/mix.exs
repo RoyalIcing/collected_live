@@ -24,7 +24,7 @@ defmodule CollectedLiveWeb.MixProject do
   def application do
     [
       mod: {CollectedLiveWeb.Application, []},
-      extra_applications: [:logger, :runtime_tools, :phoenix_ecto]
+      extra_applications: [:logger, :runtime_tools]
     ]
   end
 

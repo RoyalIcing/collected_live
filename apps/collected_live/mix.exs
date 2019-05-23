@@ -36,6 +36,7 @@ defmodule CollectedLive.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
+      {:cachex, "~> 3.1"},
       {:ecto, "~> 3.1.4"}
     ]
   end

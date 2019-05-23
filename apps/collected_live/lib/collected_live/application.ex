@@ -7,6 +7,12 @@ defmodule CollectedLive.Application do
 
   def start(_type, _args) do
     children = [
+      # {Cachex, [:content_cache, []]}
+      # Supervisor.child_spec({Cachex, {:content_cache, []}}, id: :content_cache)
+      %{
+        id: :content_cache,
+        start: {Cachex, :start_link, [:content_cache, []]}
+      }
       # CollectedLive.Worker
     ]
 

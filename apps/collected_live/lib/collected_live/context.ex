@@ -1,15 +1,19 @@
 defmodule CollectedLive.Content do
   alias CollectedLive.Content.Text
 
+  @cache_name :content_cache
+
   def list_content do
-    []
+    query = Cachex.Query.create(true, { :key, :value })
+    Cachex.stream!(@cache_name, query)
+      |> Enum.map(fn {id, content} -> %Text{id: id, content: content} end)
   end
 
   def change_text(%Text{} = text) do
     Text.changeset(text)
   end
 
-  def create_text(params) do
+  defp build_text(params) do
     with {:ok, text} <- %Text{}
       |> Text.changeset(params)
       |> Ecto.Changeset.apply_action(:insert)
@@ -18,17 +22,30 @@ defmodule CollectedLive.Content do
     end
   end
 
-  def get_text!(id_encoded) do
-    case Base.url_decode64(id_encoded) do
-      {:ok, id} ->
-        %Text{id: id}
-
-      :error ->
-        raise Ecto.NoResultsError
+  def create_text(params) do
+    with {:ok, text} <- build_text(params),
+      {:ok, _} <- Cachex.put(@cache_name, text.id, text.content)
+    do
+      {:ok, text}
     end
   end
 
-  def delete_text(%Text{} = text) do
+  defp decode_id(id_encoded), do: Base.url_decode64(id_encoded)
 
+  def get_text!(id_encoded) do
+    with {:ok, id} <- decode_id(id_encoded),
+      {:ok, content} <- Cachex.get(@cache_name, id)
+    do
+      %Text{id: id, content: content}
+    else
+      _ -> raise Ecto.NoResultsError
+    end
+  end
+
+  def delete_text(id_encoded) do
+    with {:ok, id} <- decode_id(id_encoded)
+    do
+      Cachex.del(@cache_name, id)
+    end
   end
 end

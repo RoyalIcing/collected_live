@@ -3,14 +3,14 @@
 <table>
   <thead>
     <tr>
-
+      <th>Content</th>
       <th></th>
     </tr>
   </thead>
   <tbody>
 <%= for text <- @content do %>
     <tr>
-
+      <td><%= text.content %></td>
       <td>
         <%= link "Show", to: Routes.text_path(@conn, :show, text) %>
         <%= link "Edit", to: Routes.text_path(@conn, :edit, text) %>
