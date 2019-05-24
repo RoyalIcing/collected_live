@@ -36,6 +36,13 @@ defmodule CollectedLiveWeb.TextController do
     text(conn, text.content)
   end
 
+  def show_text_css(conn, %{"text_id" => id}) do
+    text = Content.get_text!(id)
+    conn
+    |> put_resp_content_type("text/css")
+    |> send_resp(200, text.content)
+  end
+
   def edit(conn, %{"id" => id}) do
     text = Content.get_text!(id)
     changeset = Content.change_text(text)

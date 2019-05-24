@@ -19,6 +19,7 @@ defmodule CollectedLiveWeb.Router do
     get "/", PageController, :index
     resources "/text", TextController do
       get "/text/plain", TextController, :show_text_plain, as: :text_plain
+      get "/text/css", TextController, :show_text_css, as: :text_css
     end
   end
 
