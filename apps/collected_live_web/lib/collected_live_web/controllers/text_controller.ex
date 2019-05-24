@@ -31,6 +31,11 @@ defmodule CollectedLiveWeb.TextController do
     render(conn, "show.html", text: text)
   end
 
+  def show_text_plain(conn, %{"text_id" => id}) do
+    text = Content.get_text!(id)
+    text(conn, text.content)
+  end
+
   def edit(conn, %{"id" => id}) do
     text = Content.get_text!(id)
     changeset = Content.change_text(text)

@@ -1,6 +1,16 @@
+<nav>
+  <ul>
+    <li><%= link "All Text", to: Routes.text_path(@conn, :index) %></li>
+  </ul>
+</nav>
+
 <h1>Show Text</h1>
+<span><%= link "Edit", to: Routes.text_path(@conn, :edit, @text) %></span>
+<span><%= link "Back", to: Routes.text_path(@conn, :index) %></span>
 
 <div><%= @text.content %></div>
 
-<span><%= link "Edit", to: Routes.text_path(@conn, :edit, @text) %></span>
-<span><%= link "Back", to: Routes.text_path(@conn, :index) %></span>
+<h3>Formats</h3>
+<ul>
+  <li><%= link "text/plain", to: Routes.text_text_plain_path(@conn, :show_text_plain, @text) %></li>
+</ul>
