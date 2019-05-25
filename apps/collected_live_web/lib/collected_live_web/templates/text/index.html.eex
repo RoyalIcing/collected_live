@@ -10,7 +10,7 @@
   <tbody>
 <%= for text <- @content do %>
     <tr>
-      <td><%= text.content %></td>
+      <td><%= String.slice(text.content, 0..60) %></td>
       <td>
         <%= link "Show", to: Routes.text_path(@conn, :show, text) %>
         <%= link "Edit", to: Routes.text_path(@conn, :edit, text) %>

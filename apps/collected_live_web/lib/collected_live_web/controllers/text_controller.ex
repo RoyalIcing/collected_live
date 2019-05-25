@@ -52,10 +52,10 @@ defmodule CollectedLiveWeb.TextController do
   def update(conn, %{"id" => id, "text" => text_params}) do
     text = Content.get_text!(id)
 
-    case Content.update_text(text, text_params) do
+    case Content.create_text(text, text_params) do
       {:ok, text} ->
         conn
-        |> put_flash(:info, "Text updated successfully.")
+        |> put_flash(:info, "Text created successfully.")
         |> redirect(to: Routes.text_path(conn, :show, text))
 
       {:error, %Ecto.Changeset{} = changeset} ->
