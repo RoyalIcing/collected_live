@@ -7,7 +7,7 @@ use Mix.Config
 # watchers to your application. For example, we use it
 # with webpack to recompile .js and .css sources.
 config :collected_live_web, CollectedLiveWeb.Endpoint,
-  http: [port: 4000],
+  http: [port: 4222],
   debug_errors: true,
   code_reloader: true,
   # reloadable_compilers: [:phoenix, :gettext],
