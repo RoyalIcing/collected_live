@@ -6,12 +6,25 @@ defmodule CollectedLiveWeb.TextController do
 
   def index(conn, _params) do
     content = Content.list_content()
-    render(conn, "index.html", content: content)
+    import_changeset = Content.change_text(%Text{})
+    render(conn, "index.html", content: content, import_changeset: import_changeset)
   end
 
   def new(conn, _params) do
     changeset = Content.change_text(%Text{})
     render(conn, "new.html", changeset: changeset)
+  end
+
+  def create(conn, %{"text" => %{"url" => url}}) do
+    case Content.import_text(%{"url" => url}) do
+      {:ok, text} ->
+        conn
+        |> put_flash(:info, "Text imported successfully.")
+        |> redirect(to: Routes.text_path(conn, :show, text))
+
+      {:error, %Ecto.Changeset{} = import_changeset} ->
+        render(conn, "index.html", content: [], import_changeset: import_changeset)
+    end
   end
 
   def create(conn, %{"text" => text_params}) do
@@ -52,7 +65,7 @@ defmodule CollectedLiveWeb.TextController do
   def update(conn, %{"id" => id, "text" => text_params}) do
     text = Content.get_text!(id)
 
-    case Content.create_text(text, text_params) do
+    case Content.create_text(text_params) do
       {:ok, text} ->
         conn
         |> put_flash(:info, "Text created successfully.")

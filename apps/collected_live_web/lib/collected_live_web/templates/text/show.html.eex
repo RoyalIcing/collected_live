@@ -7,10 +7,10 @@
 <h1>Show Text</h1>
 <span><%= link "Edit", to: Routes.text_path(@conn, :edit, @text) %></span>
 
-<div><%= @text.content %></div>
+<pre><%= @text.content %></pre>
 
 <h3>Formats</h3>
 <ul>
-  <li><%= link "text/plain", to: Routes.text_text_plain_path(@conn, :show_text_plain, @text) %></li>
-  <li><%= link "text/css", to: Routes.text_text_css_path(@conn, :show_text_css, @text) %></li>
+  <li><%= link "text/plain", to: Routes.text_plain_path(@conn, :show_text_plain, @text) %></li>
+  <li><%= link "text/css", to: Routes.text_css_path(@conn, :show_text_css, @text) %></li>
 </ul>

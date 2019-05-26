@@ -1,4 +1,6 @@
-<h1>Listing Content</h1>
+<h1>Content</h1>
+
+<span><%= link "Write", to: Routes.text_path(@conn, :new) %></span>
 
 <table>
   <thead>
@@ -21,4 +23,9 @@
   </tbody>
 </table>
 
-<span><%= link "New Text", to: Routes.text_path(@conn, :new) %></span>
+<h2>Import</h2>
+
+<%= render "import_form.html", Map.merge(assigns, %{
+  action: Routes.text_path(@conn, :create),
+  changeset: @import_changeset
+}) %>

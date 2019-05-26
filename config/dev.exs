@@ -10,6 +10,8 @@ config :collected_live_web, CollectedLiveWeb.Endpoint,
   http: [port: 4000],
   debug_errors: true,
   code_reloader: true,
+  # reloadable_compilers: [:phoenix, :gettext],
+  reloadable_apps: [:collected_live, :collected_live_web],
   check_origin: false,
   watchers: [
     node: [
