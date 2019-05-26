@@ -72,8 +72,7 @@ defmodule CollectedLiveWeb.TextController do
   end
 
   def delete(conn, %{"id" => id}) do
-    text = Content.get_text!(id)
-    {:ok, _text} = Content.delete_text(text)
+    {:ok, _text} = Content.delete_text(id)
 
     conn
     |> put_flash(:info, "Text deleted successfully.")
