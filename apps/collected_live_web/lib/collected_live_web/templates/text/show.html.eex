@@ -11,6 +11,6 @@
 
 <h3>Formats</h3>
 <ul>
-  <li><%= link "text/plain", to: Routes.text_plain_path(@conn, :show_text_plain, @text) %></li>
-  <li><%= link "text/css", to: Routes.text_css_path(@conn, :show_text_css, @text) %></li>
+  <li><%= link "text/plain", to: Routes.text_path(@conn, :show_text_format, @text, "plain") %></li>
+  <li><%= link "text/css", to: Routes.text_path(@conn, :show_text_format, @text, "css") %></li>
 </ul>

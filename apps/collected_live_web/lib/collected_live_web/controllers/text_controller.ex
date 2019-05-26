@@ -44,15 +44,10 @@ defmodule CollectedLiveWeb.TextController do
     render(conn, "show.html", text: text)
   end
 
-  def show_text_plain(conn, %{"text_id" => id}) do
-    text = Content.get_text!(id)
-    text(conn, text.content)
-  end
-
-  def show_text_css(conn, %{"text_id" => id}) do
+  def show_text_format(conn, %{"id" => id, "format" => format}) do
     text = Content.get_text!(id)
     conn
-    |> put_resp_content_type("text/css")
+    |> put_resp_content_type("text/" <> format)
     |> send_resp(200, text.content)
   end
 
