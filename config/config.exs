@@ -21,6 +21,12 @@ config :collected_live_web, CollectedLiveWeb.Endpoint,
   render_errors: [view: CollectedLiveWeb.ErrorView, accepts: ~w(html json)],
   pubsub: [name: CollectedLiveWeb.PubSub, adapter: Phoenix.PubSub.PG2]
 
+# LiveView
+config :collected_live_web, CollectedLiveWeb.Endpoint,
+  live_view: [
+    signing_salt: "7TXxs3RrJpb1o6FrVm8fU56M88zeqsU6"
+  ]
+
 # Configures Elixir's Logger
 config :logger, :console,
   format: "$time $metadata[$level] $message\n",

@@ -2,6 +2,8 @@
 
 <span><%= link "Write", to: Routes.text_path(@conn, :new) %></span>
 
+<%= Phoenix.LiveView.live_render(@conn, CollectedLiveWeb.ActivityLive, session: %{}) %>
+
 <table>
   <thead>
     <tr>

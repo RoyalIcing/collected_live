@@ -23,6 +23,7 @@ defmodule CollectedLiveWeb do
       import Plug.Conn
       import CollectedLiveWeb.Gettext
       alias CollectedLiveWeb.Router.Helpers, as: Routes
+      import Phoenix.LiveView.Controller, only: [live_render: 3]
     end
   end
 
@@ -41,6 +42,7 @@ defmodule CollectedLiveWeb do
       import CollectedLiveWeb.ErrorHelpers
       import CollectedLiveWeb.Gettext
       alias CollectedLiveWeb.Router.Helpers, as: Routes
+      import Phoenix.LiveView, only: [live_render: 2, live_render: 3]
     end
   end
 
@@ -49,6 +51,7 @@ defmodule CollectedLiveWeb do
       use Phoenix.Router
       import Plug.Conn
       import Phoenix.Controller
+      import Phoenix.LiveView.Router
     end
   end
 

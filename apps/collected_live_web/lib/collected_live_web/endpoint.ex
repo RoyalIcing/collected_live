@@ -1,6 +1,8 @@
 defmodule CollectedLiveWeb.Endpoint do
   use Phoenix.Endpoint, otp_app: :collected_live_web
 
+  socket "/live", Phoenix.LiveView.Socket
+
   socket "/socket", CollectedLiveWeb.UserSocket,
     websocket: true,
     longpoll: false
