@@ -21,6 +21,8 @@ defmodule CollectedLiveWeb.Router do
 
     resources "/text", TextController
     get "/text/:id/text/:format", TextController, :show_text_format
+
+    get "/fake-search", FakeSearchController, :index
   end
 
   # Other scopes may use custom stacks.

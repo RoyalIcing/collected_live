@@ -38,7 +38,8 @@ defmodule CollectedLive.MixProject do
     [
       {:cachex, "~> 3.1"},
       {:ecto, "~> 3.1.4"},
-      {:httpotion, "~> 3.1.0"}
+      {:httpotion, "~> 3.1.0"},
+      {:jason, "~> 1.0"}
     ]
   end
 
