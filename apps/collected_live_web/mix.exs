@@ -48,7 +48,7 @@ defmodule CollectedLiveWeb.MixProject do
       {:jason, "~> 1.0"},
       {:plug_cowboy, "~> 2.0"},
       {:ueberauth, "~> 0.6"},
-      {:oauth2, "~> 1.0", override: true},
+      {:oauth2, "~> 2.0", override: true},
       {:ueberauth_github, "~> 0.7"}
     ]
   end
