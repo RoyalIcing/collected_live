@@ -24,7 +24,7 @@ defmodule CollectedLiveWeb.MixProject do
   def application do
     [
       mod: {CollectedLiveWeb.Application, []},
-      extra_applications: [:logger, :runtime_tools]
+      extra_applications: [:logger, :runtime_tools, :ueberauth, :ueberauth_github]
     ]
   end
 
@@ -46,7 +46,9 @@ defmodule CollectedLiveWeb.MixProject do
       {:gettext, "~> 0.11"},
       {:collected_live, in_umbrella: true},
       {:jason, "~> 1.0"},
-      {:plug_cowboy, "~> 2.0"}
+      {:plug_cowboy, "~> 2.0"},
+      {:ueberauth, "~> 0.6"},
+      {:ueberauth_github, "~> 0.7"}
     ]
   end
 
