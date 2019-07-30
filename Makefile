@@ -5,5 +5,12 @@ install:
 dev:
 	iex -S mix phx.server
 
+status:
+	gigalixir ps
+
+logs:
+	gigalixir logs
+
 deploy:
 	git push gigalixir master
+	make status
