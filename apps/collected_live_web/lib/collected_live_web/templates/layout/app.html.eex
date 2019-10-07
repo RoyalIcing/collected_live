@@ -11,8 +11,9 @@
     <header>
       <section class="container">
         <nav role="navigation">
-          <ul>
+          <ul class="flex flex-row items-center justify-around">
             <li><a href="/">Home</a></li>
+            <li><a href="/text">Text</a></li>
             <li><a href="/text/new">Write</a></li>
           </ul>
         </nav>
