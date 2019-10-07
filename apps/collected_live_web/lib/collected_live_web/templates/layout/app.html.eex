@@ -8,19 +8,20 @@
     <link rel="stylesheet" href="<%= Routes.static_path(@conn, "/css/app.css") %>"/>
   </head>
   <body>
-    <header>
-      <section class="container">
+    <header class="bg-gray-900 text-white">
+      <section class="px-2 flex flex-row justify-between">
+        <a class="block px-3 py-2 font-bold" href="/">Collected.Live</a>
         <nav role="navigation">
           <ul class="flex flex-row items-center justify-around">
-            <li><a href="/">Home</a></li>
-            <li><a href="/text">Text</a></li>
-            <li><a href="/text/new">Write</a></li>
+            <li><a class="block px-3 py-2" href="/">Home</a></li>
+            <li><a class="block px-3 py-2" href="/svg">SVG</a></li>
+            <li><a class="block px-3 py-2" href="/text">Text</a></li>
+            <li><a class="block px-3 py-2" href="/text/new">Write</a></li>
           </ul>
         </nav>
-        <strong><a href="/">Collected.Live</a></strong>
       </section>
     </header>
-    <main role="main" class="container">
+    <main role="main">
       <p class="alert alert-info" role="alert"><%= get_flash(@conn, :info) %></p>
       <p class="alert alert-danger" role="alert"><%= get_flash(@conn, :error) %></p>
       <%= render @view_module, @view_template, assigns %>

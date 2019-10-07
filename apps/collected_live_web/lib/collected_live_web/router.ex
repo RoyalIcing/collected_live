@@ -28,6 +28,8 @@ defmodule CollectedLiveWeb.Router do
 
     get "/", PageController, :index
 
+    get "/svg", SVGController, :index
+
     resources "/text", TextController
     get "/text/:id/text/:format", TextController, :show_text_format
 
