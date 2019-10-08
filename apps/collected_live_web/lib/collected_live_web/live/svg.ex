@@ -83,7 +83,7 @@ defmodule CollectedLiveWeb.SVGLive do
     <div class="py-4 bg-gray-200">
       <img src="<%= svg_url(%{ logo: @logo, color: @color }) %>" class="block mx-auto">
     </div>
-    <pre class="px-2 py-1 text-sm break-words bg-gray-200"><%= svg_url(%{ logo: @logo, color: @color }) %></pre>
+    <pre class="px-2 py-1 text-sm break-words bg-gray-200"><a href="<%= svg_url(%{ logo: @logo, color: @color }) %>" class="hover:underline"><%= svg_url(%{ logo: @logo, color: @color }) %></a></pre>
     """
   end
 
