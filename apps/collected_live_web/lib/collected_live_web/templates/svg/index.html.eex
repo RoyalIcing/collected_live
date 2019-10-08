@@ -1,6 +1,6 @@
 <div class="max-w-3xl mx-auto">
-  <header class="py-2">
-    <h1 class="text-3xl"><%= gettext "%{name}", name: "CollectedQL SVG" %></h1>
+  <header class="py-4">
+    <h1 class="text-4xl"><%= gettext "%{name}", name: "CollectedQL SVG" %></h1>
   </header>
 
   <%= Phoenix.LiveView.live_render(@conn, CollectedLiveWeb.SVGLive, session: %{}) %>
