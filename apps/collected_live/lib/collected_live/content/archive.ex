@@ -1,14 +1,22 @@
 defmodule CollectedLive.Content.Archive do
-  use Ecto.Schema
-  import Ecto.Changeset
+  defmodule Input do
+    use Ecto.Schema
+    import Ecto.Changeset
 
-  embedded_schema do
-    field :url, :string
+    embedded_schema do
+      field :url, :string
+    end
+
+    def changeset(%__MODULE__{} = archive, params \\ %{}) do
+      archive
+        |> cast(params, [:url])
+        |> validate_required([:url])
+    end
   end
 
-  def changeset(%__MODULE__{} = archive, params \\ %{}) do
-    archive
-      |> cast(params, [:url])
-      |> validate_required([:url])
+  defmodule Zip do
+    defstruct [zip: nil]
+
+
   end
 end

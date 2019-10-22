@@ -3,11 +3,13 @@ defmodule CollectedLive.GitHubArchiveDownloader do
 
   @cache_name :github_archive_download_cache
 
-  defp get_url(url) do
+  defp fetch_url(url) do
+    IO.puts("fetching url")
     Cachex.put(@cache_name, url, :pending)
 
     Task.start(fn ->
       result = HTTPClient.get(url)
+
       case result do
         {:ok, response} -> received_data_for_url(url, response.body)
         _ -> ""
@@ -28,15 +30,25 @@ defmodule CollectedLive.GitHubArchiveDownloader do
   end
 
   defp received_data_for_url(url, data) when is_binary(data) do
-    {:ok, [_comment | zip_files]} = :zip.list_dir(data)
-    Cachex.put(@cache_name, url, {:ok, zip_files})
+    Cachex.put(@cache_name, url, {:ok, data})
+
+    # Cachex.execute!(@cache_name, fn(cache) ->
+    #   {:ok, zip_handle} = :zip.zip_open(data, [:memory])
+    #   Cachex.put!(cache, url, {:ok, zip_handle})
+    # end)
 
     send_message_for_url(url, {:completed_download_for_url, url})
   end
 
   def use_url(url) do
-    get_url(url)
-    status_for_url(url)
+    case status_for_url(url) do
+      :not_requested ->
+        fetch_url(url)
+        :pending
+
+      status ->
+        status
+    end
   end
 
   def subscribe_for_url(url) when is_binary(url) do
@@ -51,9 +63,60 @@ defmodule CollectedLive.GitHubArchiveDownloader do
 
   def status_for_url(url) do
     case Cachex.get(@cache_name, url) do
+      {:ok, nil} -> :not_requested
       {:ok, :pending} -> :pending
       {:ok, {:ok, _zip_files}} -> :completed
       other -> other
+    end
+  end
+
+  def result_for_url(url) do
+    with {:ok, result} <- Cachex.get(@cache_name, url),
+         {:ok, data} <- result,
+         {:ok, [_comment | zip_files]} = :zip.list_dir(data) do
+      zip_files
+    else
+      _ -> nil
+    end
+  end
+
+  def file_info_for(url, filename) do
+    filename_chars = to_charlist(filename)
+
+    with {:ok, result} <- Cachex.get(@cache_name, url),
+         {:ok, data} <- result,
+         {:ok, info} <-
+           :zip.foldl(
+             fn
+               ^filename_chars, get_info, _get_binary, _acc -> get_info.()
+               _, _, _, acc -> acc
+             end,
+             nil,
+             {'name.zip', data}
+           ) do
+      info
+    else
+      _ -> nil
+    end
+  end
+
+  def file_content_for(url, filename) do
+    filename_chars = to_charlist(filename)
+
+    with {:ok, result} <- Cachex.get(@cache_name, url),
+         {:ok, data} <- result,
+         {:ok, file_data} <-
+           :zip.foldl(
+             fn
+               ^filename_chars, _get_info, get_binary, _acc -> get_binary.()
+               _, _, _, acc -> acc
+             end,
+             nil,
+             {'name.zip', data}
+           ) do
+      file_data
+    else
+      _ -> nil
     end
   end
 
