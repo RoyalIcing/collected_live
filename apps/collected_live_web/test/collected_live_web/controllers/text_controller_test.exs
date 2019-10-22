@@ -3,9 +3,9 @@ defmodule CollectedLiveWeb.TextControllerTest do
 
   alias CollectedLive.Content
 
-  @create_attrs %{}
-  @update_attrs %{}
-  @invalid_attrs %{}
+  @create_attrs %{ content: "initial text" }
+  @update_attrs %{ content: "updated text"}
+  @invalid_attrs %{ content: "" }
 
   def fixture(:text) do
     {:ok, text} = Content.create_text(@create_attrs)
@@ -30,7 +30,9 @@ defmodule CollectedLiveWeb.TextControllerTest do
     test "redirects to show when data is valid", %{conn: conn} do
       conn = post(conn, Routes.text_path(conn, :create), text: @create_attrs)
 
-      assert %{id: id} = redirected_params(conn)
+      assert %{id: encoded_id} = redirected_params(conn)
+      id = URI.decode(encoded_id)
+
       assert redirected_to(conn) == Routes.text_path(conn, :show, id)
 
       conn = get(conn, Routes.text_path(conn, :show, id))
@@ -56,10 +58,12 @@ defmodule CollectedLiveWeb.TextControllerTest do
     setup [:create_text]
 
     test "redirects when data is valid", %{conn: conn, text: text} do
-      conn = put(conn, Routes.text_path(conn, :update, text), text: @update_attrs)
-      assert redirected_to(conn) == Routes.text_path(conn, :show, text)
+      {:ok, updated_text} = Content.create_text(@update_attrs)
 
-      conn = get(conn, Routes.text_path(conn, :show, text))
+      conn = put(conn, Routes.text_path(conn, :update, text), text: @update_attrs)
+      assert redirected_to(conn) == Routes.text_path(conn, :show, updated_text)
+
+      conn = get(conn, Routes.text_path(conn, :show, updated_text))
       assert html_response(conn, 200)
     end
 
