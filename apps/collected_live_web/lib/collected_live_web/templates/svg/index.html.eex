@@ -3,6 +3,8 @@
     <h1 class="text-4xl"><%= gettext "%{name}", name: "CollectedQL SVG" %></h1>
   </header>
 
+  <%= Phoenix.LiveView.live_render(@conn, CollectedLiveWeb.ZipLive, session: %{}) %>
+
   <%= Phoenix.LiveView.live_render(@conn, CollectedLiveWeb.SVGLive, session: %{}) %>
 
 </div>

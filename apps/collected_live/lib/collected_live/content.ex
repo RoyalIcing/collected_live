@@ -36,15 +36,16 @@ defmodule CollectedLive.Content do
   end
 
   def import_text(params) do
-    with changeset <- TextImport.changeset(%TextImport{}, params),
-      {:ok, text_import} <- Ecto.Changeset.apply_action(changeset, :insert),
+    changeset = TextImport.changeset(%TextImport{}, params)
+    with {:ok, text_import} <- Ecto.Changeset.apply_action(changeset, :insert),
       response <- get_url(text_import.url),
       {:ok, text} <- build_text(%{ content: response.body }),
       {:ok, _} <- Cachex.put(@cache_name, text.id, text.content)
     do
       {:ok, text}
     else
-      %HTTPotion.ErrorResponse{message: message} -> {:error, message}
+      %HTTPotion.ErrorResponse{message: _message} -> {:error, changeset}
+      {:error, _} -> {:error, changeset}
     end
   end
 

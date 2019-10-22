@@ -36,6 +36,9 @@ defmodule CollectedLive.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
+      {:tesla, "~> 1.3.0"},
+      {:hackney, "~> 1.14.0"},
+      {:mox, "~> 0.5", only: :test},
       {:cachex, "~> 3.1"},
       {:ecto, "~> 3.1.4"},
       {:httpotion, "~> 3.1.0"},

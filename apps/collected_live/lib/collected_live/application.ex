@@ -9,9 +9,14 @@ defmodule CollectedLive.Application do
     children = [
       # {Cachex, [:content_cache, []]}
       # Supervisor.child_spec({Cachex, {:content_cache, []}}, id: :content_cache)
+      {Registry, keys: :duplicate, name: CollectedLive.GitHubArchiveDownloader},
       %{
         id: :content_cache,
         start: {Cachex, :start_link, [:content_cache, []]}
+      },
+      %{
+        id: :github_archive_download_cache,
+        start: {Cachex, :start_link, [:github_archive_download_cache, []]}
       }
       # CollectedLive.Worker
     ]

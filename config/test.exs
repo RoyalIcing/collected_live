@@ -8,3 +8,6 @@ config :collected_live_web, CollectedLiveWeb.Endpoint,
 
 # Print only warnings and errors during test
 config :logger, level: :warn
+
+#config :tesla, adapter: Tesla.Mock
+config :tesla, CollectedLive.HTTPClient, adapter: CollectedLive.HTTPClient.Mock
