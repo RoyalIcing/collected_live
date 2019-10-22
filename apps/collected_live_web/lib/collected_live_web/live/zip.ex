@@ -71,6 +71,8 @@ defmodule CollectedLiveWeb.ZipLive do
 
     url = "https://github.com/facebook/react/archive/v16.10.2.zip"
 
+    zip_files = GitHubArchiveDownloader.result_for_url(url)
+
     GitHubArchiveDownloader.subscribe_for_url(url)
     GitHubArchiveDownloader.use_url(url)
 
@@ -96,7 +98,7 @@ defmodule CollectedLiveWeb.ZipLive do
     {:ok,
      assign(socket,
        url: url,
-       zip_files: nil,
+       zip_files: zip_files,
        selected_file_name: nil,
        selected_file_info: nil,
        selected_file_content: nil
