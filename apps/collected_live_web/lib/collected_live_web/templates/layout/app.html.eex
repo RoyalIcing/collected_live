@@ -11,8 +11,8 @@
     <header class="bg-gray-900 text-white">
       <section class="px-2 flex flex-row justify-between">
         <a class="block px-3 py-2 font-bold" href="/">Collected.Live</a>
-        <nav role="navigation">
-          <ul class="flex flex-row items-center justify-around">
+        <nav role="navigation" class="max-w-3xl">
+          <ul class="flex flex-row">
             <li><a class="block px-3 py-2" href="/search/code">Search Code</a></li>
             <li><a class="block px-3 py-2" href="/svg">Search Icons</a></li>
             <%# <li><a class="block px-3 py-2" href="/text">Text</a></li> %>

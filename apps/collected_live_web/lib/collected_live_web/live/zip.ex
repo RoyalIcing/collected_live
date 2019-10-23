@@ -15,7 +15,11 @@ defmodule CollectedLiveWeb.ZipLive do
          file_name_filter
        )
        when is_binary(file_name_filter) do
-    String.contains?(to_string(name), file_name_filter)
+      if String.length(file_name_filter) > 2 do
+        String.contains?(to_string(name), file_name_filter)
+      else
+        true
+      end
   end
 
   defp include_zip_file?(
@@ -33,7 +37,7 @@ defmodule CollectedLiveWeb.ZipLive do
        ) do
     %{
       name: name,
-      content: "#{name} (#{size} bytes)"
+      content: "#{name}"
     }
   end
 
@@ -47,33 +51,36 @@ defmodule CollectedLiveWeb.ZipLive do
 
   def render(assigns) do
     ~L"""
-    <div class="my-2">
-      <p class="text-xl font-bold mb-4"><%= @url %></p>
-
-      <div class="flex flex-row h-screen text-sm">
-        <div class="w-1/4 overflow-scroll pl-2 pr-2 bg-gray-800 text-white">
+    <div class="h-screen flex flex-col">
+      <p class="px-2 py-2 text-center text-xl font-bold text-gray-900 bg-gray-500"><%= @url %></p>
+      <div class="flex flex-row text-sm min-h-full">
+        <div class="flex flex-col w-1/4 bg-gray-800 text-white">
           <%= if @zip_files == nil do %>
             <p class="italic p-1">Loading…</p>
           <% end %>
           <%= if @zip_files != nil do %>
             <% filtered_files = Enum.filter(@zip_files, fn (file) -> include_zip_file?(file, @file_name_filter) end) %>
 
-            <%= f = form_for :files_list, "#", [phx_change: :change_files_list, class: "pt-2 pb-2"] %>
-              <%= text_input f, :file_name_filter, placeholder: "Filter names", class: "block w-full px-2 py-1 rounded-sm bg-gray-900" %>
-            </form>
+            <div class="pl-2 pr-2 shadow-lg">
+              <%= f = form_for :files_list, "#", [phx_change: :change_files_list, class: "pt-2 pb-2"] %>
+                <%= text_input f, :file_name_filter, placeholder: "Filter names", class: "block w-full px-2 py-1 rounded-sm bg-gray-900" %>
+              </form>
 
-            <p class="text-center text-xs"><%= pluralize(Enum.count(filtered_files), "file") %></p>
+              <p class="text-center text-xs pb-1"><%= pluralize(Enum.count(filtered_files), "file") %></p>
+            </div>
 
-            <ul>
-            <%= for file <- filtered_files do %>
-              <%= case present_zip_file(file) do
-                nil -> ""
-                %{ name: name, content: content } -> content_tag(:li) do
-                  content_tag(:button, content, phx_click: "select_zip_file", phx_value_name: name, class: "text-left pt-1 pb-1")
-                end
-              end %>
-            <% end %>
-            </ul>
+            <div class="overflow-scroll pl-2 pr-2">
+              <ul class="pt-1">
+              <%= for file <- filtered_files do %>
+                <%= case present_zip_file(file) do
+                  nil -> ""
+                  %{ name: name, content: content } -> content_tag(:li) do
+                    content_tag(:button, content, phx_click: "select_zip_file", phx_value_name: name, class: "text-left pb-1")
+                  end
+                end %>
+              <% end %>
+              </ul>
+            </div>
           <% end %>
         </div>
         <div class="w-3/4 pl-2 overflow-scroll bg-gray-900 text-white">
@@ -86,7 +93,6 @@ defmodule CollectedLiveWeb.ZipLive do
           <% end %>
         </div>
       </div>
-
     </div>
     """
   end
