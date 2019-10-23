@@ -15,11 +15,11 @@ defmodule CollectedLiveWeb.ZipLive do
          file_name_filter
        )
        when is_binary(file_name_filter) do
-      if String.length(file_name_filter) > 2 do
-        String.contains?(to_string(name), file_name_filter)
-      else
-        true
-      end
+    if String.length(file_name_filter) > 2 do
+      String.contains?(to_string(name), file_name_filter)
+    else
+      true
+    end
   end
 
   defp include_zip_file?(
@@ -36,7 +36,7 @@ defmodule CollectedLiveWeb.ZipLive do
            _}, _comment, _offset, _comp_size}
        ) do
     %{
-      name: name,
+      name: to_string(name),
       content: "#{name}"
     }
   end
@@ -69,13 +69,17 @@ defmodule CollectedLiveWeb.ZipLive do
               <p class="text-center text-xs pb-1"><%= pluralize(Enum.count(filtered_files), "file") %></p>
             </div>
 
-            <div class="overflow-scroll pl-2 pr-2">
+            <div class="overflow-scroll">
               <ul class="pt-1">
               <%= for file <- filtered_files do %>
                 <%= case present_zip_file(file) do
                   nil -> ""
                   %{ name: name, content: content } -> content_tag(:li) do
-                    content_tag(:button, content, phx_click: "select_zip_file", phx_value_name: name, class: "text-left pb-1")
+                    content_tag( :button, content, phx_click: "select_zip_file", phx_value_name: name,
+                    class: "w-full text-left pl-2 pr-2 pb-1
+                    focus:text-gray-900
+                    #{if name == @selected_file_name, do: "text-gray-900 bg-white focus:bg-white", else: "focus:bg-gray-200"}
+                    ")
                   end
                 end %>
               <% end %>
