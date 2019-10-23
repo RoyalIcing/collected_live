@@ -1,0 +1,9 @@
+<div class="max-w-3xl mx-auto">
+  <header class="py-4">
+    <h1 class="text-4xl"><%= gettext "%{name}", name: "Search Code" %></h1>
+  </header>
+</div>
+
+<div>
+  <%= Phoenix.LiveView.live_render(@conn, CollectedLiveWeb.ZipLive, session: %{}) %>
+</div>

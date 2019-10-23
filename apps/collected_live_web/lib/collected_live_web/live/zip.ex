@@ -4,7 +4,7 @@ defmodule CollectedLiveWeb.ZipLive do
   require Logger
   alias CollectedLive.GitHubArchiveDownloader
 
-  defp display_zip_file(
+  defp present_zip_file(
          {:zip_file, name,
           {:file_info, size, :regular, _access, _atime, _mtime, _ctime, _mode, _links, _, _, _, _,
            _}, _comment, _offset, _comp_size}
@@ -15,7 +15,7 @@ defmodule CollectedLiveWeb.ZipLive do
     }
   end
 
-  defp display_zip_file(_), do: nil
+  defp present_zip_file(_), do: nil
 
   defp display_file_bytes(
          {:file_info, size, :regular, _access, _atime, _mtime, _ctime, _mode, _links, _, _, _, _,
@@ -28,32 +28,31 @@ defmodule CollectedLiveWeb.ZipLive do
     <div class="my-2">
       <p class="text-xl font-bold mb-4"><%= @url %></p>
 
-      <%= if @zip_files == nil do %>
-        <p>Loading…</p>
-      <% end %>
-
       <div class="flex flex-row h-screen text-sm">
-        <div class="w-1/4 overflow-scroll text-left">
+        <div class="w-1/4 overflow-scroll pl-2 pr-2 bg-gray-800 text-white">
+          <%= if @zip_files == nil do %>
+            <p class="italic p-1">Loading…</p>
+          <% end %>
           <%= if @zip_files != nil do %>
             <ul>
             <%= for file <- @zip_files do %>
-              <%= case display_zip_file(file) do
+              <%= case present_zip_file(file) do
                 nil -> ""
                 %{ name: name, content: content } -> content_tag(:li) do
-                  content_tag(:button, content, "phx-click": "select_zip_file", "phx-value-name": name, class: "text-left")
+                  content_tag(:button, content, "phx-click": "select_zip_file", "phx-value-name": name, class: "text-left pt-1 pb-1")
                 end
               end %>
             <% end %>
             </ul>
           <% end %>
         </div>
-        <div class="w-3/4 pl-2 overflow-scroll">
+        <div class="w-3/4 pl-2 overflow-scroll bg-gray-900 text-white">
           <%= if @selected_file_info != nil do %>
             <p><%= display_file_bytes(@selected_file_info) %></p>
           <% end %>
 
           <%= if @selected_file_content != nil do %>
-            <pre class="break-words"><%= @selected_file_content %></pre>
+            <pre class="break-words p-1"><%= @selected_file_content %></pre>
           <% end %>
         </div>
       </div>
@@ -75,25 +74,6 @@ defmodule CollectedLiveWeb.ZipLive do
 
     GitHubArchiveDownloader.subscribe_for_url(url)
     GitHubArchiveDownloader.use_url(url)
-
-    # parent = self()
-
-    # Task.start(fn ->
-    #   response = HTTPotion.get(url, follow_redirects: true, timeout: 30000)
-
-    #   data =
-    #     case response do
-    #       %HTTPotion.ErrorResponse{} -> ""
-    #       response -> response.body
-    #     end
-
-    #   send(parent, {:downloaded_url, data})
-
-    #   if byte_size(data) > 0 do
-    #     {:ok, [_comment | zip_files]} = :zip.list_dir(data)
-    #     send(parent, {:downloaded_zip_files, zip_files})
-    #   end
-    # end)
 
     {:ok,
      assign(socket,
