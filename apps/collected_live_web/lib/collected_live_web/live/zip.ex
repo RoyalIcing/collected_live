@@ -4,6 +4,28 @@ defmodule CollectedLiveWeb.ZipLive do
   require Logger
   alias CollectedLive.GitHubArchiveDownloader
 
+  defp pluralize(count, thing) when is_integer(count) and is_binary(thing) do
+    "#{count} #{Inflex.inflect(thing, count)}"
+  end
+
+  defp include_zip_file?(
+         {:zip_file, name,
+          {:file_info, _size, :regular, _access, _atime, _mtime, _ctime, _mode, _links, _, _, _,
+           _, _}, _comment, _offset, _comp_size},
+         file_name_filter
+       )
+       when is_binary(file_name_filter) do
+    String.contains?(to_string(name), file_name_filter)
+  end
+
+  defp include_zip_file?(
+         {:zip_file, _, {:file_info, _, _, _, _, _, _, _, _, _, _, _, _, _}, _, _, _},
+         file_name_filter
+       )
+       when is_binary(file_name_filter) do
+    false
+  end
+
   defp present_zip_file(
          {:zip_file, name,
           {:file_info, size, :regular, _access, _atime, _mtime, _ctime, _mode, _links, _, _, _, _,
@@ -34,12 +56,20 @@ defmodule CollectedLiveWeb.ZipLive do
             <p class="italic p-1">Loading…</p>
           <% end %>
           <%= if @zip_files != nil do %>
+            <% filtered_files = Enum.filter(@zip_files, fn (file) -> include_zip_file?(file, @file_name_filter) end) %>
+
+            <%= f = form_for :files_list, "#", [phx_change: :change_files_list, class: "pt-2 pb-2"] %>
+              <%= text_input f, :file_name_filter, placeholder: "Filter names", class: "block w-full px-2 py-1 rounded-sm bg-gray-900" %>
+            </form>
+
+            <p class="text-center text-xs"><%= pluralize(Enum.count(filtered_files), "file") %></p>
+
             <ul>
-            <%= for file <- @zip_files do %>
+            <%= for file <- filtered_files do %>
               <%= case present_zip_file(file) do
                 nil -> ""
                 %{ name: name, content: content } -> content_tag(:li) do
-                  content_tag(:button, content, "phx-click": "select_zip_file", "phx-value-name": name, class: "text-left pt-1 pb-1")
+                  content_tag(:button, content, phx_click: "select_zip_file", phx_value_name: name, class: "text-left pt-1 pb-1")
                 end
               end %>
             <% end %>
@@ -79,6 +109,7 @@ defmodule CollectedLiveWeb.ZipLive do
      assign(socket,
        url: url,
        zip_files: zip_files,
+       file_name_filter: "",
        selected_file_name: nil,
        selected_file_info: nil,
        selected_file_content: nil
@@ -109,5 +140,13 @@ defmodule CollectedLiveWeb.ZipLive do
        selected_file_info: file_info,
        selected_file_content: file_content
      )}
+  end
+
+  def handle_event(
+        "change_files_list",
+        %{"files_list" => %{"file_name_filter" => file_name_filter}},
+        socket
+      ) do
+    {:noreply, assign(socket, file_name_filter: file_name_filter)}
   end
 end

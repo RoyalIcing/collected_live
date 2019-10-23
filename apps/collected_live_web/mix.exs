@@ -50,7 +50,8 @@ defmodule CollectedLiveWeb.MixProject do
       {:plug_cowboy, "~> 2.0"},
       {:ueberauth, "~> 0.6"},
       {:oauth2, "~> 2.0", override: true},
-      {:ueberauth_github, "~> 0.7"}
+      {:ueberauth_github, "~> 0.7"},
+      { :inflex, "~> 2.0.0" }
     ]
   end
 
