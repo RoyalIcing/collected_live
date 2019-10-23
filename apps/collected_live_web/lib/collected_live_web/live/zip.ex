@@ -91,13 +91,7 @@ defmodule CollectedLiveWeb.ZipLive do
     """
   end
 
-  # defp new_uuid do
-  #   Ecto.UUID.generate
-  # end
-
   def mount(%{}, socket) do
-    # if connected?(socket), do: :timer.send_interval(5000, self(), :update)
-
     url = "https://github.com/facebook/react/archive/v16.10.2.zip"
 
     zip_files = GitHubArchiveDownloader.result_for_url(url)
@@ -120,14 +114,6 @@ defmodule CollectedLiveWeb.ZipLive do
     zip_files = GitHubArchiveDownloader.result_for_url(url)
     {:noreply, assign(socket, :zip_files, zip_files)}
   end
-
-  # def handle_info({:downloaded_url, data}, socket) do
-  #   {:noreply, assign(socket, :data, data)}
-  # end
-
-  # def handle_info({:downloaded_zip_files, zip_files}, socket) do
-  #   {:noreply, assign(socket, :zip_files, zip_files)}
-  # end
 
   def handle_event("select_zip_file", %{"name" => name}, socket) do
     url = socket.assigns[:url]
