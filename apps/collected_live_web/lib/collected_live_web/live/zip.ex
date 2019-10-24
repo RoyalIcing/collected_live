@@ -101,9 +101,7 @@ defmodule CollectedLiveWeb.ZipLive do
     """
   end
 
-  def mount(%{}, socket) do
-    url = "https://github.com/facebook/react/archive/v16.10.2.zip"
-
+  def mount(%{url: url}, socket) do
     zip_files = GitHubArchiveDownloader.result_for_url(url)
 
     GitHubArchiveDownloader.subscribe_for_url(url)
