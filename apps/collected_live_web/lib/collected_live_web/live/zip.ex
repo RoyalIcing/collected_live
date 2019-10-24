@@ -3,31 +3,10 @@ defmodule CollectedLiveWeb.ZipLive do
   use Phoenix.HTML
   require Logger
   alias CollectedLive.GitHubArchiveDownloader
+  alias CollectedLive.Content.Archive
 
   defp pluralize(count, thing) when is_integer(count) and is_binary(thing) do
     "#{count} #{Inflex.inflect(thing, count)}"
-  end
-
-  defp include_zip_file?(
-         {:zip_file, name,
-          {:file_info, _size, :regular, _access, _atime, _mtime, _ctime, _mode, _links, _, _, _,
-           _, _}, _comment, _offset, _comp_size},
-         file_name_filter
-       )
-       when is_binary(file_name_filter) do
-    if String.length(file_name_filter) > 2 do
-      String.contains?(to_string(name), file_name_filter)
-    else
-      true
-    end
-  end
-
-  defp include_zip_file?(
-         {:zip_file, _, {:file_info, _, _, _, _, _, _, _, _, _, _, _, _, _}, _, _, _},
-         file_name_filter
-       )
-       when is_binary(file_name_filter) do
-    false
   end
 
   defp present_zip_file(
@@ -59,11 +38,12 @@ defmodule CollectedLiveWeb.ZipLive do
             <p class="italic p-1">Loading…</p>
           <% end %>
           <%= if @zip_files != nil do %>
-            <% filtered_files = Enum.filter(@zip_files, fn (file) -> include_zip_file?(file, @file_name_filter) end) %>
+            <% filtered_files = Archive.Zip.filtered_zip_files(@archive, %{name_containing: @file_name_filter}) %>
 
             <div class="pl-2 pr-2 shadow-lg">
-              <%= f = form_for :files_list, "#", [phx_change: :change_files_list, class: "pt-2 pb-2"] %>
+              <%= f = form_for :file_filtering, "#", [phx_change: :filter_files, class: "pt-2 pb-2"] %>
                 <%= text_input f, :file_name_filter, placeholder: "Filter names", class: "block w-full px-2 py-1 rounded-sm bg-gray-900" %>
+                <%= text_input f, :contents_filter, placeholder: "Search code", class: "mt-2 block w-full px-2 py-1 rounded-sm bg-gray-900" %>
               </form>
 
               <p class="text-center text-xs pb-1"><%= pluralize(Enum.count(filtered_files), "file") %></p>
@@ -102,7 +82,7 @@ defmodule CollectedLiveWeb.ZipLive do
   end
 
   def mount(%{url: url}, socket) do
-    zip_files = GitHubArchiveDownloader.result_for_url(url)
+    zip_archive = GitHubArchiveDownloader.result_for_url(url)
 
     GitHubArchiveDownloader.subscribe_for_url(url)
     GitHubArchiveDownloader.use_url(url)
@@ -110,8 +90,10 @@ defmodule CollectedLiveWeb.ZipLive do
     {:ok,
      assign(socket,
        url: url,
-       zip_files: zip_files,
+       archive: zip_archive,
+       zip_files: Archive.Zip.zip_files(zip_archive),
        file_name_filter: "",
+       contents_filter: "",
        selected_file_name: nil,
        selected_file_info: nil,
        selected_file_content: nil
@@ -124,9 +106,9 @@ defmodule CollectedLiveWeb.ZipLive do
   end
 
   def handle_event("select_zip_file", %{"name" => name}, socket) do
-    url = socket.assigns[:url]
-    file_info = GitHubArchiveDownloader.file_info_for(url, name)
-    file_content = GitHubArchiveDownloader.file_content_for(url, name)
+    archive = socket.assigns[:archive]
+    file_info = Archive.Zip.info_for_file_named(archive, name)
+    file_content = Archive.Zip.content_for_file_named(archive, name)
 
     {:noreply,
      assign(socket,
@@ -137,10 +119,18 @@ defmodule CollectedLiveWeb.ZipLive do
   end
 
   def handle_event(
-        "change_files_list",
-        %{"files_list" => %{"file_name_filter" => file_name_filter}},
+        "filter_files",
+        %{"file_filtering" => %{"file_name_filter" => file_name_filter}},
         socket
       ) do
     {:noreply, assign(socket, file_name_filter: file_name_filter)}
+  end
+
+  def handle_event(
+        "filter_files",
+        %{"file_filtering" => %{"contents_filter" => contents_filter}},
+        socket
+      ) do
+    {:noreply, assign(socket, contents_filter: contents_filter)}
   end
 end
