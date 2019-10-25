@@ -11,6 +11,12 @@ defmodule CollectedLive.MixProject do
       lockfile: "../../mix.lock",
       elixir: "~> 1.5",
       elixirc_paths: elixirc_paths(Mix.env()),
+      compilers: [:rustler] ++ Mix.compilers(),
+      rustler_crates: [
+        collectedlive_syntaxhighlighter: [
+          path: "../../native/collectedlive_syntaxhighlighter"
+        ]
+      ],
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
       deps: deps()
@@ -23,7 +29,7 @@ defmodule CollectedLive.MixProject do
   def application do
     [
       mod: {CollectedLive.Application, []},
-      extra_applications: [:logger, :runtime_tools]
+      extra_applications: [:logger, :runtime_tools, :rustler]
     ]
   end
 
@@ -42,7 +48,8 @@ defmodule CollectedLive.MixProject do
       {:cachex, "~> 3.1"},
       {:ecto, "~> 3.1.4"},
       {:httpotion, "~> 3.1.0"},
-      {:jason, "~> 1.0"}
+      {:jason, "~> 1.0"},
+      {:rustler, "~> 0.21.0"}
     ]
   end
 

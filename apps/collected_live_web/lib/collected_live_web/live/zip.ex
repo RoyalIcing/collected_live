@@ -30,6 +30,19 @@ defmodule CollectedLiveWeb.ZipLive do
        ),
        do: "#{size} bytes"
 
+  defp get_name_extension(filename) do
+    parts = String.split(filename, ".")
+    List.last(parts)
+  end
+
+  defp display_file_content(filename, content) do
+    extension = get_name_extension(filename)
+
+    content_tag(:pre, class: "break-words p-1") do
+      CollectedLive.SyntaxHighlighter.highlight(extension, content)
+    end
+  end
+
   def render(assigns) do
     ~L"""
     <div class="h-screen flex flex-col">
@@ -78,7 +91,7 @@ defmodule CollectedLiveWeb.ZipLive do
           <% end %>
 
           <%= if @selected_file_content != nil do %>
-            <pre class="break-words p-1"><%= @selected_file_content %></pre>
+            <%= display_file_content(@selected_file_name, @selected_file_content) %>
           <% end %>
         </div>
       </div>
