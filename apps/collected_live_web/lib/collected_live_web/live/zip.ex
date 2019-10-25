@@ -38,12 +38,15 @@ defmodule CollectedLiveWeb.ZipLive do
             <p class="italic p-1">Loading…</p>
           <% end %>
           <%= if @zip_files != nil do %>
-            <% filtered_files = Archive.Zip.filtered_zip_files(@archive, %{name_containing: @file_name_filter}) %>
+            <% filtered_files = Archive.Zip.filtered_zip_files(
+              @archive,
+              %{name_containing: @file_name_filter, content_containing: @contents_filter}
+            ) %>
 
             <div class="pl-2 pr-2 shadow-lg">
               <%= f = form_for :file_filtering, "#", [phx_change: :filter_files, class: "pt-2 pb-2"] %>
-                <%= text_input f, :file_name_filter, placeholder: "Filter names", class: "block w-full px-2 py-1 rounded-sm bg-gray-900" %>
-                <%= text_input f, :contents_filter, placeholder: "Search code", class: "mt-2 block w-full px-2 py-1 rounded-sm bg-gray-900" %>
+                <%= text_input f, :file_name_filter, placeholder: "Filter names", class: "block w-full px-2 py-1 rounded-sm bg-gray-900", phx_debounce: "250" %>
+                <%= text_input f, :contents_filter, placeholder: "Search code", class: "mt-2 block w-full px-2 py-1 rounded-sm bg-gray-900", phx_debounce: "250" %>
               </form>
 
               <p class="text-center text-xs pb-1"><%= pluralize(Enum.count(filtered_files), "file") %></p>
@@ -120,17 +123,15 @@ defmodule CollectedLiveWeb.ZipLive do
 
   def handle_event(
         "filter_files",
-        %{"file_filtering" => %{"file_name_filter" => file_name_filter}},
+        %{
+          "file_filtering" => %{
+            "file_name_filter" => file_name_filter,
+            "contents_filter" => contents_filter
+          }
+        },
         socket
       ) do
-    {:noreply, assign(socket, file_name_filter: file_name_filter)}
-  end
-
-  def handle_event(
-        "filter_files",
-        %{"file_filtering" => %{"contents_filter" => contents_filter}},
-        socket
-      ) do
-    {:noreply, assign(socket, contents_filter: contents_filter)}
+    {:noreply,
+     assign(socket, file_name_filter: file_name_filter, contents_filter: contents_filter)}
   end
 end
