@@ -34,10 +34,10 @@ defmodule CollectedLiveWeb.ZipLive do
       <p class="px-2 py-2 text-center text-xl font-bold text-gray-900 bg-gray-500"><%= @url %></p>
       <div class="flex flex-row text-sm min-h-full">
         <div class="flex flex-col w-1/4 bg-gray-800 text-white">
-          <%= if @zip_files == nil do %>
+          <%= if @archive == nil do %>
             <p class="italic p-1">Loading…</p>
           <% end %>
-          <%= if @zip_files != nil do %>
+          <%= if @archive != nil do %>
             <% filtered_files = Archive.Zip.filtered_zip_files(
               @archive,
               %{name_containing: @file_name_filter, content_containing: @contents_filter}
@@ -94,6 +94,39 @@ defmodule CollectedLiveWeb.ZipLive do
      assign(socket,
        url: url,
        archive: zip_archive,
+       file_name_filter: "",
+       contents_filter: "",
+       selected_file_name: nil,
+       selected_file_info: nil,
+       selected_file_content: nil
+     )}
+  end
+
+  def mount(%{}, socket) do
+    {:ok,
+     assign(socket,
+       url: "",
+       archive: nil,
+       file_name_filter: "",
+       contents_filter: "",
+       selected_file_name: nil,
+       selected_file_info: nil,
+       selected_file_content: nil
+     )}
+  end
+
+  def handle_params(%{"owner" => owner, "repo" => repo, "release" => release}, _uri, socket) do
+    url = "https://github.com/#{owner}/#{repo}/archive/#{release}.zip"
+
+    zip_archive = GitHubArchiveDownloader.result_for_url(url)
+
+    GitHubArchiveDownloader.subscribe_for_url(url)
+    GitHubArchiveDownloader.use_url(url)
+
+    {:noreply,
+     assign(socket,
+       url: url,
+       archive: zip_archive,
        zip_files: Archive.Zip.zip_files(zip_archive),
        file_name_filter: "",
        contents_filter: "",
@@ -103,9 +136,24 @@ defmodule CollectedLiveWeb.ZipLive do
      )}
   end
 
+  def handle_params(%{}, uri, socket) do
+    {:noreply,
+     live_redirect(
+       socket,
+       to:
+         CollectedLiveWeb.Router.Helpers.live_path(
+           socket,
+           __MODULE__,
+           "facebook",
+           "react",
+           "v16.11.0"
+         )
+     )}
+  end
+
   def handle_info({:completed_download_for_url, url}, socket) do
-    zip_files = GitHubArchiveDownloader.result_for_url(url)
-    {:noreply, assign(socket, :zip_files, zip_files)}
+    archive = GitHubArchiveDownloader.result_for_url(url)
+    {:noreply, assign(socket, :archive, archive)}
   end
 
   def handle_event("select_zip_file", %{"name" => name}, socket) do

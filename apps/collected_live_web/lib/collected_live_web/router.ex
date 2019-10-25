@@ -30,8 +30,8 @@ defmodule CollectedLiveWeb.Router do
 
     get "/svg", SVGController, :index
 
-    get "/search/code", CodeSearchController, :index
-    get "/search/code/github/:owner/:repo/:release", CodeSearchController, :index
+    live "/search/code", ZipLive
+    live "/search/code/github/:owner/:repo/:release", ZipLive
 
     resources "/text", TextController
     get "/text/:id/text/:format", TextController, :show_text_format
