@@ -1,5 +1,5 @@
-https://github.com/vapor-community/heroku-buildpack.git
 https://github.com/emk/heroku-buildpack-rust.git
 https://github.com/HashNuke/heroku-buildpack-elixir
 https://github.com/gjaldon/heroku-buildpack-phoenix-static
 https://github.com/gigalixir/gigalixir-buildpack-mix.git
+https://github.com/vapor-community/heroku-buildpack.git
