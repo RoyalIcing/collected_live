@@ -5,6 +5,8 @@ defmodule CollectedLiveWeb.ZipLive do
   alias CollectedLive.GitHubArchiveDownloader
   alias CollectedLive.Content.Archive
 
+  @default_params %{"owner" => "facebook", "repo" => "react", "release" => "v16.11.0"}
+
   defp pluralize(count, thing) when is_integer(count) and is_binary(thing) do
     "#{count} #{Inflex.inflect(thing, count)}"
   end
@@ -45,8 +47,8 @@ defmodule CollectedLiveWeb.ZipLive do
 
             <div class="pl-2 pr-2 shadow-lg">
               <%= f = form_for :file_filtering, "#", [phx_change: :filter_files, class: "pt-2 pb-2"] %>
-                <%= text_input f, :file_name_filter, placeholder: "Filter names", class: "block w-full px-2 py-1 rounded-sm bg-gray-900", phx_debounce: "250" %>
-                <%= text_input f, :contents_filter, placeholder: "Search code", class: "mt-2 block w-full px-2 py-1 rounded-sm bg-gray-900", phx_debounce: "250" %>
+                <%= text_input f, :file_name_filter, placeholder: "Filter names", class: "block w-full px-2 py-1 rounded-sm bg-gray-900", phx_debounce: "250", value: @file_name_filter %>
+                <%= text_input f, :contents_filter, placeholder: "Search code", class: "mt-2 block w-full px-2 py-1 rounded-sm bg-gray-900", phx_debounce: "250", value: @contents_filter %>
               </form>
 
               <p class="text-center text-xs pb-1"><%= pluralize(Enum.count(filtered_files), "file") %></p>
@@ -84,24 +86,6 @@ defmodule CollectedLiveWeb.ZipLive do
     """
   end
 
-  def mount(%{url: url}, socket) do
-    zip_archive = GitHubArchiveDownloader.result_for_url(url)
-
-    GitHubArchiveDownloader.subscribe_for_url(url)
-    GitHubArchiveDownloader.use_url(url)
-
-    {:ok,
-     assign(socket,
-       url: url,
-       archive: zip_archive,
-       file_name_filter: "",
-       contents_filter: "",
-       selected_file_name: nil,
-       selected_file_info: nil,
-       selected_file_content: nil
-     )}
-  end
-
   def mount(%{}, socket) do
     {:ok,
      assign(socket,
@@ -115,7 +99,11 @@ defmodule CollectedLiveWeb.ZipLive do
      )}
   end
 
-  def handle_params(%{"owner" => owner, "repo" => repo, "release" => release}, _uri, socket) do
+  def handle_params(
+        params = %{"owner" => owner, "repo" => repo, "release" => release},
+        _uri,
+        socket
+      ) do
     url = "https://github.com/#{owner}/#{repo}/archive/#{release}.zip"
 
     zip_archive = GitHubArchiveDownloader.result_for_url(url)
@@ -123,20 +111,23 @@ defmodule CollectedLiveWeb.ZipLive do
     GitHubArchiveDownloader.subscribe_for_url(url)
     GitHubArchiveDownloader.use_url(url)
 
+    file_name_filter = Map.get(params, "file_name_filter", "")
+    contents_filter = Map.get(params, "contents_filter", "")
+
     {:noreply,
      assign(socket,
        url: url,
+       params: params,
        archive: zip_archive,
-       zip_files: Archive.Zip.zip_files(zip_archive),
-       file_name_filter: "",
-       contents_filter: "",
+       file_name_filter: file_name_filter,
+       contents_filter: contents_filter,
        selected_file_name: nil,
        selected_file_info: nil,
        selected_file_content: nil
      )}
   end
 
-  def handle_params(%{}, uri, socket) do
+  def handle_params(_params, uri, socket) do
     {:noreply,
      live_redirect(
        socket,
@@ -144,9 +135,9 @@ defmodule CollectedLiveWeb.ZipLive do
          CollectedLiveWeb.Router.Helpers.live_path(
            socket,
            __MODULE__,
-           "facebook",
-           "react",
-           "v16.11.0"
+           @default_params["owner"],
+           @default_params["repo"],
+           @default_params["release"]
          )
      )}
   end
@@ -180,6 +171,17 @@ defmodule CollectedLiveWeb.ZipLive do
         socket
       ) do
     {:noreply,
-     assign(socket, file_name_filter: file_name_filter, contents_filter: contents_filter)}
+     live_redirect(
+       socket,
+       to:
+         CollectedLiveWeb.Router.Helpers.live_path(
+           socket,
+           __MODULE__,
+           socket.assigns.params["owner"],
+           socket.assigns.params["repo"],
+           socket.assigns.params["release"],
+           %{file_name_filter: file_name_filter, contents_filter: contents_filter}
+         )
+     )}
   end
 end
