@@ -1,5 +1,5 @@
 https://github.com/emk/heroku-buildpack-rust
-https://github.com/cloudfoundry/apt-buildpack
+https://github.com/RoyalIcing/apt-buildpack
 https://github.com/HashNuke/heroku-buildpack-elixir
 https://github.com/gjaldon/heroku-buildpack-phoenix-static
 https://github.com/gigalixir/gigalixir-buildpack-mix.git
