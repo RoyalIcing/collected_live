@@ -11,6 +11,9 @@ status:
 logs:
 	gigalixir logs
 
+build_docker:
+	docker run -it -v "$(shell pwd)":/tmp/app us.gcr.io/gigalixir-152404/herokuish:latest
+
 deploy:
-	git push gigalixir master
+	git -c http.extraheader="GIGALIXIR-CLEAN: true" push gigalixir master
 	make status
