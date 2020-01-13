@@ -1,10 +1,6 @@
 use Mix.Config
 
-host =
-  case System.get_env("SERVICE_HOSTNAME") do
-    nil -> System.get_env("APP_NAME") <> ".gigalixirapp.com"
-    host -> host
-  end
+host = System.get_env("SERVICE_HOSTNAME") || System.get_env("RENDER_EXTERNAL_HOSTNAME") || (System.get_env("APP_NAME") <> ".gigalixirapp.com")
 
 IO.puts("host: #{host}")
 
