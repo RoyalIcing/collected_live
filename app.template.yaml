@@ -1,0 +1,10 @@
+env: flex
+runtime: gs://elixir-runtime/elixir.yaml
+entrypoint: mix phx.server
+runtime_config:
+  packages:
+    - llvm-toolchain-stretch
+    - cargo
+env_variables:
+  SERVICE_HOSTNAME: CHANGE_THIS
+  SECRET_KEY_BASE: CHANGE_THIS
