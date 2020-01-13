@@ -11,9 +11,13 @@ status:
 logs:
 	gigalixir logs
 
-build_docker:
+build_docker_gigalixir:
 	docker run -it -v "$(shell pwd)":/tmp/app us.gcr.io/gigalixir-152404/herokuish:latest
 
-deploy:
+deploy_gigalixir:
 	git -c http.extraheader="GIGALIXIR-CLEAN: true" push gigalixir master
 	make status
+
+deploy_app_engine:
+	gcloud config set app/cloud_build_timeout 2000
+	gcloud app deploy app.yaml --project "${PROJECT}"
