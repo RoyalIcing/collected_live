@@ -1,5 +1,13 @@
 use Mix.Config
 
+host =
+  case System.get_env("SERVICE_HOSTNAME") do
+    nil -> System.get_env("APP_NAME") <> ".gigalixirapp.com"
+    host -> host
+  end
+
+IO.puts("host: #{host}")
+
 # For production, don't forget to configure the url host
 # to something meaningful, Phoenix uses this information
 # when generating URLs.
@@ -10,7 +18,7 @@ use Mix.Config
 # which you should run after static files are built and
 # before starting your production server.
 config :collected_live_web, CollectedLiveWeb.Endpoint,
-  url: [host: System.get_env("APP_NAME") <> ".gigalixirapp.com", port: 80],
+  url: [host: host, port: 80],
   cache_static_manifest: "priv/static/cache_manifest.json"
 
 # ## SSL Support
