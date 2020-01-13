@@ -35,11 +35,12 @@ defmodule CollectedLiveWeb.ZipLive do
     List.last(parts)
   end
 
-  defp display_file_content(filename, content) do
-    extension = get_name_extension(filename)
+  defp display_file_content(_filename, content) do
+    # extension = get_name_extension(filename)
 
     content_tag(:pre, class: "break-words p-1") do
-      CollectedLive.SyntaxHighlighter.highlight(extension, content)
+      # CollectedLive.SyntaxHighlighter.highlight(extension, content)
+      content
     end
   end
 

@@ -1,6 +1,6 @@
 defmodule CollectedLive.SyntaxHighlighter do
   defmodule Engine do
-    use Rustler, otp_app: :collected_live, crate: :collectedlive_syntaxhighlighter
+    # use Rustler, otp_app: :collected_live, crate: :collectedlive_syntaxhighlighter
 
     def highlight_html(_input, _extension), do: :erlang.nif_error(:nif_not_loaded)
   end

@@ -7,11 +7,10 @@
   </header>
 
   <h1>Syntax!</h1>
-  <%= CollectedLive.SyntaxHighlighter.highlight(:html, "<div>hello!!!</div>") %>
-  <%= CollectedLive.SyntaxHighlighter.highlight(:js, "export const a = 5;") %>
-  <%= CollectedLive.SyntaxHighlighter.highlight(:css, "html { color: red; }") %>
-  <%= CollectedLive.SyntaxHighlighter.highlight(:ts, "export const a = 5;") %>
-  <%#= CollectedLive.SyntaxHighlighter.highlight(:html, "<div>hello</div>") %>
+  <%#= CollectedLive.SyntaxHighlighter.highlight(:html, "<div>hello!!!</div>") %>
+  <%#= CollectedLive.SyntaxHighlighter.highlight(:js, "export const a = 5;") %>
+  <%#= CollectedLive.SyntaxHighlighter.highlight(:css, "html { color: red; }") %>
+  <%#= CollectedLive.SyntaxHighlighter.highlight(:ts, "export const a = 5;") %>
 
   <ul class="text-2xl list-disc leading-loose">
     <li>Search SVG icons and replace colors — all on the server</li>

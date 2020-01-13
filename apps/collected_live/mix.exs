@@ -11,12 +11,7 @@ defmodule CollectedLive.MixProject do
       lockfile: "../../mix.lock",
       elixir: "~> 1.5",
       elixirc_paths: elixirc_paths(Mix.env()),
-      compilers: [:rustler] ++ Mix.compilers(),
-      rustler_crates: [
-        collectedlive_syntaxhighlighter: [
-          path: "../../native/collectedlive_syntaxhighlighter"
-        ]
-      ],
+      compilers: Mix.compilers(),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
       deps: deps()
