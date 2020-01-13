@@ -3,9 +3,16 @@ defmodule CollectedLive.Umbrella.MixProject do
 
   def project do
     [
+      version: "0.1.0",
       apps_path: "apps",
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      default_release: :whole,
+      releases: [
+        whole: [
+          applications: [collected_live: :permanent, collected_live_web: :permanent]
+        ]
+      ]
     ]
   end
 
