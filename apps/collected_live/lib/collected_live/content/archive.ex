@@ -29,7 +29,7 @@ defmodule CollectedLive.Content.Archive do
   defmodule Zip do
     defstruct zip_data: nil
 
-    alias CollectedLive.Content.Archive.Item
+    # alias CollectedLive.Content.Archive.Item
 
     def from_data(data) when is_binary(data) do
       %__MODULE__{zip_data: data}
@@ -40,10 +40,6 @@ defmodule CollectedLive.Content.Archive do
         {:ok, [_comment | zip_files]} -> zip_files
         _ -> nil
       end
-    end
-
-    def zip_files(zip = %__MODULE__{zip_data: data}) do
-      Enum.map(zip_files(zip), &Item.from_zip_file/1)
     end
 
     defp include_name?(name, name_containing)

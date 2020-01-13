@@ -13,7 +13,7 @@ defmodule CollectedLiveWeb.ZipLive do
 
   defp present_zip_file(
          {:zip_file, name,
-          {:file_info, size, :regular, _access, _atime, _mtime, _ctime, _mode, _links, _, _, _, _,
+          {:file_info, _size, :regular, _access, _atime, _mtime, _ctime, _mode, _links, _, _, _, _,
            _}, _comment, _offset, _comp_size}
        ) do
     %{
@@ -140,7 +140,7 @@ defmodule CollectedLiveWeb.ZipLive do
      )}
   end
 
-  def handle_params(_params, uri, socket) do
+  def handle_params(_params, _uri, socket) do
     {:noreply,
      live_redirect(
        socket,

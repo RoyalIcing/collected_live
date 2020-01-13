@@ -2,7 +2,7 @@ defmodule CollectedLiveWeb.AuthController do
   use CollectedLiveWeb, :controller
 
   plug Ueberauth
-  alias Ueberauth.Strategy.Helpers
+  # alias Ueberauth.Strategy.Helpers
 
   def request(conn, _params) do
     render(conn, "request.html")
