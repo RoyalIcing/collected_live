@@ -46,6 +46,13 @@ defmodule CollectedLiveWeb do
     end
   end
 
+  def live_view do
+    quote do
+      use Phoenix.LiveView
+      use Phoenix.HTML
+    end
+  end
+
   def router do
     quote do
       use Phoenix.Router

@@ -30,6 +30,8 @@ defmodule CollectedLiveWeb.Router do
 
     get "/svg", SVGController, :index
 
+    get "/weave", WeaveController, :index
+
     live "/search/code", ZipLive
     live "/search/code/github/:owner/:repo/:release", ZipLive
 
