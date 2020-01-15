@@ -6,8 +6,8 @@ defmodule CollectedLiveWeb.WeaveLive do
     defstruct filled: %{}, focused: nil
 
     def max_row(state = %State{}) do
-      default = fn -> {{nil, 0}, nil} end
-      {{_col, row}, _value} = Enum.max_by(state.filled, fn({{_col, row}, _value}) -> row end, default)
+      default = fn -> {{0, nil}, nil} end
+      {{row, _col}, _value} = Enum.max_by(state.filled, fn({{row, _col}, _value}) -> row end, default)
       row
     end
   end
@@ -37,10 +37,10 @@ defmodule CollectedLiveWeb.WeaveLive do
     {:ok, assign(socket, state: %State{})}
   end
 
-  defp slot_payload(%{"col" => col_s, "row" => row_s}) do
-    col = col_s |> String.to_integer
+  defp slot_payload(%{"row" => row_s, "col" => col_s}) do
     row = row_s |> String.to_integer
-    %{col: col, row: row}
+    col = col_s |> String.to_integer
+    %{row: row, col: col}
   end
 
   def handle_event("slot-click", _payload, socket) do
@@ -48,10 +48,10 @@ defmodule CollectedLiveWeb.WeaveLive do
   end
 
   def handle_event("slot-focus", payload, socket) do
-    %{col: col, row: row} = slot_payload(payload)
+    %{row: row, col: col} = slot_payload(payload)
 
     state = socket.assigns.state
-    state = %State{state | focused: {col, row}}
+    state = %State{state | focused: {row, col}}
 
     {:noreply, assign(socket, state: state)}
   end
@@ -78,7 +78,7 @@ defmodule CollectedLiveWeb.WeaveLive do
   def handle_event("slot-keyup", %{"key" => key}, socket) when key in ["#", "1", "+"] do
     state = socket.assigns.state
     filled = case state.focused do
-      {col, row} -> Map.put(state.filled, {col, row}, slot_value_for_key(key))
+      {row, col} -> Map.put(state.filled, {row, col}, slot_value_for_key(key))
       nil -> state.filled
     end
 
@@ -94,7 +94,7 @@ defmodule CollectedLiveWeb.WeaveLive do
     state = socket.assigns.state
     filled = Enum.reduce(heading_changes, state.filled, fn {row_s, value}, filled ->
       row = row_s |> String.to_integer
-      Map.put(filled, {0, row}, {:heading, value})
+      Map.put(filled, {row, 0}, {:heading, value})
     end)
 
     state = %State{state | filled: filled}

@@ -4,7 +4,7 @@ defmodule CollectedLiveWeb.Components.WeaveRow do
   alias CollectedLiveWeb.Components.WeaveCell
 
   def render(assigns) do
-    first = Map.get(assigns.filled, {0, assigns.row})
+    first = Map.get(assigns.filled, {assigns.row, 0})
 
     case first do
       {:heading, text} ->
@@ -34,7 +34,7 @@ defmodule CollectedLiveWeb.Components.WeaveRow do
     ~L"""
     <div class="flex flex-row">
       <%= for col <- 0..@cols-1 do %>
-        <%= live_component @socket, WeaveCell, col: col, row: @row, value: Map.get(@filled, {col, @row}) %>
+        <%= live_component @socket, WeaveCell, row: @row, col: col, value: Map.get(@filled, {@row, col}) %>
       <% end %>
     </div>
     """
