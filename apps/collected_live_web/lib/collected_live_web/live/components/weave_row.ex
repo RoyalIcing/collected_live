@@ -4,9 +4,9 @@ defmodule CollectedLiveWeb.Components.WeaveRow do
   alias CollectedLiveWeb.Components.WeaveCell
 
   def render(assigns) do
-    type = Map.get(assigns.filled, {0, assigns.row})
+    first = Map.get(assigns.filled, {0, assigns.row})
 
-    case type do
+    case first do
       {:heading, text} ->
         assigns = Map.put(assigns, :text, text)
         render(:heading, assigns)
@@ -22,7 +22,7 @@ defmodule CollectedLiveWeb.Components.WeaveRow do
         <%= label do %>
           <span class="text-xs text-gray-600 uppercase">Heading</span>
           <%= text_input(:heading, "#{@row}", value: @text, id: "weave-heading-#{@row}", phx_hook: "Autofocusing",
-          class: "block w-full m-1 border")
+          class: "block w-full m-1 px-3 py-2 border")
           %>
         <% end %>
       </form>

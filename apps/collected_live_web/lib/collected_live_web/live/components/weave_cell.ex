@@ -26,6 +26,36 @@ defmodule CollectedLiveWeb.Components.WeaveCell do
     """
   end
 
+  def render(assigns = %{value: {:math, equation}}) do
+    ~L"""
+    <button
+      tabindex="0" onclick="focus()"
+      phx-click="slot-click"
+      phx-focus="slot-focus"
+      phx-blur="slot-blur"
+      phx-keyup="slot-keyup"
+      phx-value-col="<%= @col %>" phx-value-row="<%= @row %>"
+      class="
+          block
+          focus:border-blue-500
+          focus:outline-none
+        "
+    >
+      <svg viewBox="0 0 32 32"
+        class="
+          block
+          w-16 h-16
+          m-1 px-2 rounded
+          bg-blue-200
+          border border-grey-500
+        "
+      >
+        <text x="16" y="20" text-anchor="middle" class="text-xs"><%= equation %></text>
+      </svg>
+    </button>
+    """
+  end
+
   def render(assigns) do
     ~L"""
     <button

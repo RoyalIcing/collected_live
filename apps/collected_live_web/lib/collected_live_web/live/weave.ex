@@ -71,7 +71,11 @@ defmodule CollectedLiveWeb.WeaveLive do
     {:fill, "black"}
   end
 
-  def handle_event("slot-keyup", %{"key" => key}, socket) when key in ["#", "1"] do
+  defp slot_value_for_key("+") do
+    {:math, "1 + 1"}
+  end
+
+  def handle_event("slot-keyup", %{"key" => key}, socket) when key in ["#", "1", "+"] do
     state = socket.assigns.state
     filled = case state.focused do
       {col, row} -> Map.put(state.filled, {col, row}, slot_value_for_key(key))
