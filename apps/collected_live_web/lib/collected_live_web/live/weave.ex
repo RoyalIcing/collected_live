@@ -58,6 +58,8 @@ defmodule CollectedLiveWeb.WeaveLive do
     %{row: row, col: col}
   end
 
+  @empty_fill "lemonchiffon"
+
   defp flip_fill("black"), do: @empty_fill
   defp flip_fill(_), do: "black"
 
@@ -137,8 +139,6 @@ defmodule CollectedLiveWeb.WeaveLive do
 
     {:noreply, assign(socket, state: state)}
   end
-
-  @empty_fill "lemonchiffon"
 
   defp slot_value_for_key("#") do
     {:heading, ""}
