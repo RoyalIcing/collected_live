@@ -1,4 +1,4 @@
-<div class="max-w-3xl mx-auto">
+<div class="max-w-xl mx-auto">
   <header class="py-4">
     <h1 class="text-4xl"><%= gettext "%{name}", name: "Collected Weave" %></h1>
   </header>

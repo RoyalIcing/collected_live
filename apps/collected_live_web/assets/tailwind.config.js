@@ -1,6 +1,10 @@
 module.exports = {
   theme: {
-    extend: {}
+    extend: {
+      spacing: {
+        "18": "4.5rem"
+      }
+    }
   },
   variants: {
     backgroundColor: ["responsive", "hover", "focus", "active"]

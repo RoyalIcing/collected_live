@@ -15,7 +15,7 @@ defmodule CollectedLiveWeb.WeaveLive do
     end
 
     def col_count(_state = %State{}) do
-      9
+      7
     end
 
     def max_row(state = %State{}) do
@@ -42,7 +42,12 @@ defmodule CollectedLiveWeb.WeaveLive do
     ~L"""
     <div class="my-2">
       <%= for row <- 0..@rows-1 do %>
-        <%= live_component @socket, Components.WeaveRow, cols: @cols, row: row, filled: @state.filled %>
+        <div class="flex flex-row relative pl-6 pr-6 ml-4">
+          <div class="self-center absolute left-0 font-mono"><%= row + 1 %></div>
+          <div class="flex-1">
+            <%= live_component @socket, Components.WeaveRow, cols: @cols, row: row, filled: @state.filled %>
+          </div>
+        </div>
       <% end %>
     </div>
     """
@@ -58,7 +63,7 @@ defmodule CollectedLiveWeb.WeaveLive do
     %{row: row, col: col}
   end
 
-  @empty_fill "lemonchiffon"
+  @empty_fill "#e2e8fd"
 
   defp flip_fill("black"), do: @empty_fill
   defp flip_fill(_), do: "black"
@@ -140,8 +145,14 @@ defmodule CollectedLiveWeb.WeaveLive do
     {:noreply, assign(socket, state: state)}
   end
 
+  @valid_keys ["#", "@", "1", "2", "+"]
+
   defp slot_value_for_key("#") do
     {:heading, ""}
+  end
+
+  defp slot_value_for_key("@") do
+    {:section, ""}
   end
 
   defp slot_value_for_key("1") do
@@ -180,7 +191,7 @@ defmodule CollectedLiveWeb.WeaveLive do
     existing
   end
 
-  def handle_event("slot-keyup", %{"key" => key}, socket) when key in ["#", "1", "2", "+"] do
+  def handle_event("slot-keyup", %{"key" => key}, socket) when key in @valid_keys do
     state = socket.assigns.state
     col_count = State.col_count(state)
 
@@ -220,16 +231,31 @@ defmodule CollectedLiveWeb.WeaveLive do
     {:noreply, socket}
   end
 
-  def handle_event("heading-change", %{"heading" => heading_changes}, socket) do
-    state = socket.assigns.state
-
-    filled =
-      Enum.reduce(heading_changes, state.filled, fn {row_s, value}, filled ->
+  def handle_event(
+        "heading-change",
+        %{"heading" => heading_changes},
+        socket = %{assigns: assigns}
+      ) do
+    state =
+      Enum.reduce(heading_changes, assigns.state, fn {row_s, value}, state ->
         row = row_s |> String.to_integer()
-        Map.put(filled, {row, 0}, {:heading, value})
+        State.assign_row_col(state, row, 0, {:heading, value})
       end)
 
-    state = %State{state | filled: filled}
+    {:noreply, assign(socket, state: state)}
+  end
+
+  def handle_event(
+        "section-change",
+        %{"section" => section_changes},
+        socket = %{assigns: assigns}
+      ) do
+    state =
+      Enum.reduce(section_changes, assigns.state, fn {row_s, value}, state ->
+        row = row_s |> String.to_integer()
+        State.assign_row_col(state, row, 0, {:section, value})
+      end)
+
     {:noreply, assign(socket, state: state)}
   end
 end

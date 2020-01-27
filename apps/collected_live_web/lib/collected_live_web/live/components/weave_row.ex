@@ -8,8 +8,9 @@ defmodule CollectedLiveWeb.Components.WeaveRow do
 
     case first do
       {:heading, text} ->
-        assigns = Map.put(assigns, :text, text)
-        render(:heading, assigns)
+        render(:heading, Map.merge(assigns, %{text: text}))
+      {:section, identifier} ->
+        render(:section, Map.merge(assigns, %{identifier: identifier}))
       _ ->
         render(:cells, assigns)
     end
@@ -17,11 +18,26 @@ defmodule CollectedLiveWeb.Components.WeaveRow do
 
   def render(:heading, assigns) do
     ~L"""
-    <div class="flex flex-row">
+    <div class="flex flex-row h-18">
       <%= form_tag "#", phx_change: "heading-change", class: "flex-1" %>
         <%= label do %>
           <span class="text-xs text-gray-600 uppercase">Heading</span>
           <%= text_input(:heading, "#{@row}", value: @text, id: "weave-heading-#{@row}", phx_hook: "Autofocusing",
+          class: "block w-full m-1 px-3 py-2 border")
+          %>
+        <% end %>
+      </form>
+    </div>
+    """
+  end
+
+  def render(:section, assigns) do
+    ~L"""
+    <div class="flex flex-row h-18">
+      <%= form_tag "#", phx_change: "section-change", class: "flex-1" %>
+        <%= label do %>
+          <span class="text-xs text-gray-600 uppercase">Section</span>
+          <%= text_input(:section, "#{@row}", value: @identifier, id: "weave-section-#{@row}", phx_hook: "Autofocusing",
           class: "block w-full m-1 px-3 py-2 border")
           %>
         <% end %>
