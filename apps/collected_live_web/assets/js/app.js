@@ -19,6 +19,11 @@ const hooks = {
     mounted() {
       this.el.focus();
     }
+  },
+  Autoselecting: {
+    mounted() {
+      this.el.select();
+    }
   }
 }
 

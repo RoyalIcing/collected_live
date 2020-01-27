@@ -145,7 +145,7 @@ defmodule CollectedLiveWeb.WeaveLive do
     {:noreply, assign(socket, state: state)}
   end
 
-  @valid_keys ["#", "@", "1", "2", "+"]
+  @valid_keys ["#", "@", "-", "x", "(", "1", "2", "+"]
 
   defp slot_value_for_key("#") do
     {:heading, ""}
@@ -153,6 +153,18 @@ defmodule CollectedLiveWeb.WeaveLive do
 
   defp slot_value_for_key("@") do
     {:section, ""}
+  end
+
+  defp slot_value_for_key("-") do
+    {:list, ["First", "Second"]}
+  end
+
+  defp slot_value_for_key("x") do
+    {:checklist, ["First", "Second"]}
+  end
+
+  defp slot_value_for_key("(") do
+    {:button, ["Action"]}
   end
 
   defp slot_value_for_key("1") do
@@ -254,6 +266,20 @@ defmodule CollectedLiveWeb.WeaveLive do
       Enum.reduce(section_changes, assigns.state, fn {row_s, value}, state ->
         row = row_s |> String.to_integer()
         State.assign_row_col(state, row, 0, {:section, value})
+      end)
+
+    {:noreply, assign(socket, state: state)}
+  end
+
+  def handle_event(
+        "button-title-change",
+        %{"button" => button_changes},
+        socket = %{assigns: assigns}
+      ) do
+    state =
+      Enum.reduce(button_changes, assigns.state, fn {row_s, value}, state ->
+        row = row_s |> String.to_integer()
+        State.assign_row_col(state, row, 0, {:button, value})
       end)
 
     {:noreply, assign(socket, state: state)}
