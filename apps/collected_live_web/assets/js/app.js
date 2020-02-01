@@ -13,6 +13,8 @@ import "phoenix_html";
 
 import { Socket } from "phoenix";
 import LiveSocket from "phoenix_live_view";
+import "lite-youtube-embed";
+import "lite-youtube-embed/src/lite-yt-embed.css";
 
 const hooks = {
   Autofocusing: {

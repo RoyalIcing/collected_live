@@ -2,6 +2,7 @@ defmodule CollectedLiveWeb.Components.WeaveRow do
   use Phoenix.LiveComponent
   use Phoenix.HTML
   alias CollectedLiveWeb.Components.WeaveCell
+  alias CollectedLiveWeb.Components.LinkPreview
 
   def render(assigns) do
     first = Map.get(assigns.filled, {assigns.row, 0})
@@ -97,6 +98,7 @@ defmodule CollectedLiveWeb.Components.WeaveRow do
           %>
         <% end %>
       </form>
+      <%= live_component @socket, LinkPreview, url: @url   %>
     </div>
     """
   end
