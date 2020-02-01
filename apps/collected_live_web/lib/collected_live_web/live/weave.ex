@@ -40,15 +40,20 @@ defmodule CollectedLiveWeb.WeaveLive do
     # assigns = Map.put(assigns, :available_colors, @available_colors)
 
     ~L"""
-    <div class="my-2">
-      <%= for row <- 0..@rows-1 do %>
-        <div class="flex flex-row relative pl-6 pr-6 ml-4">
-          <div class="self-center absolute left-0 font-mono"><%= row + 1 %></div>
-          <div class="flex-1">
-            <%= live_component @socket, Components.WeaveRow, cols: @cols, row: row, filled: @state.filled %>
+    <div class="flex flex-row justify-center">
+      <div class="my-2">
+        <%= for row <- 0..@rows-1 do %>
+          <div class="flex flex-row relative pl-6 pr-6 ml-4">
+            <div class="self-center absolute left-0 font-mono"><%= row + 1 %></div>
+            <div class="flex-1">
+              <%= live_component @socket, Components.WeaveRow, cols: @cols, row: row, filled: @state.filled %>
+            </div>
           </div>
-        </div>
-      <% end %>
+        <% end %>
+      </div>
+      <div class="w-64 text-white bg-black">
+        Preview
+      </div>
     </div>
     """
   end
@@ -145,7 +150,7 @@ defmodule CollectedLiveWeb.WeaveLive do
     {:noreply, assign(socket, state: state)}
   end
 
-  @valid_keys ["#", "@", "-", "x", "(", "1", "2", "+"]
+  @valid_keys ["#", "@", "-", "%", "x", "(", "1", "2", "+"]
 
   defp slot_value_for_key("#") do
     {:heading, ""}
@@ -157,6 +162,10 @@ defmodule CollectedLiveWeb.WeaveLive do
 
   defp slot_value_for_key("-") do
     {:list, ["First", "Second"]}
+  end
+
+  defp slot_value_for_key("%") do
+    {:link, ""}
   end
 
   defp slot_value_for_key("x") do
@@ -266,6 +275,20 @@ defmodule CollectedLiveWeb.WeaveLive do
       Enum.reduce(section_changes, assigns.state, fn {row_s, value}, state ->
         row = row_s |> String.to_integer()
         State.assign_row_col(state, row, 0, {:section, value})
+      end)
+
+    {:noreply, assign(socket, state: state)}
+  end
+
+  def handle_event(
+        "link-change",
+        %{"link" => link_changes},
+        socket = %{assigns: assigns}
+      ) do
+    state =
+      Enum.reduce(link_changes, assigns.state, fn {row_s, value}, state ->
+        row = row_s |> String.to_integer()
+        State.assign_row_col(state, row, 0, {:link, value})
       end)
 
     {:noreply, assign(socket, state: state)}

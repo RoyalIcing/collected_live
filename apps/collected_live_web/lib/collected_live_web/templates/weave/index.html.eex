@@ -2,7 +2,8 @@
   <header class="py-4">
     <h1 class="text-4xl"><%= gettext "%{name}", name: "Collected Weave" %></h1>
   </header>
+</div>
 
+<div>
   <%= Phoenix.LiveView.live_render(@conn, CollectedLiveWeb.WeaveLive, session: %{}) %>
-
 </div>

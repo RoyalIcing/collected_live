@@ -16,6 +16,9 @@ defmodule CollectedLiveWeb.Components.WeaveRow do
       {:list, items} ->
         render(:list, Map.merge(assigns, %{items: items}))
 
+      {:link, url} ->
+        render(:link, Map.merge(assigns, %{url: url}))
+
       {:checklist, items} ->
         render(:checklist, Map.merge(assigns, %{items: items}))
 
@@ -74,6 +77,24 @@ defmodule CollectedLiveWeb.Components.WeaveRow do
             <%= text_input(:list, "#{@row}", value: item, id: "weave-list-#{@row}-n", class: "block w-full my-1 px-3 py-1 text-sm border") %>
           <% end %>
           <%= text_input(:list, "#{@row}", value: "", id: "weave-list-#{@row}-new", class: "block w-full my-1 px-3 py-1 text-sm border") %>
+        <% end %>
+      </form>
+    </div>
+    """
+  end
+
+  defp render(:link, assigns) do
+    ~L"""
+    <div class="flex flex-row h-18">
+      <%= form_tag "#", phx_change: "link-change", class: "flex-1" %>
+        <%= label do %>
+          <%= label_text "Link" %>
+          <%= text_input(:link, "#{@row}",
+            value: @url,
+            id: "weave-link-#{@row}",
+            phx_hook: "Autofocusing",
+            class: "block w-full m-1 px-3 py-2 border")
+          %>
         <% end %>
       </form>
     </div>
