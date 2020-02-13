@@ -5,7 +5,7 @@ defmodule CollectedLive.GitHubArchiveDownloader do
   @cache_name :github_archive_download_cache
 
   defp fetch_url(url) do
-    IO.puts("fetching url")
+    IO.puts("begin fetching url #{url}")
     Cachex.put(@cache_name, url, :pending)
 
     Task.start(fn ->
@@ -42,6 +42,7 @@ defmodule CollectedLive.GitHubArchiveDownloader do
   end
 
   def use_url(url) do
+    IO.puts("use_url #{url}")
     case status_for_url(url) do
       :not_requested ->
         fetch_url(url)
