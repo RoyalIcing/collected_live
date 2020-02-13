@@ -64,12 +64,15 @@ defmodule CollectedLive.GitHubArchiveDownloader do
   end
 
   def status_for_url(url) do
-    case Cachex.get(@cache_name, url) do
+    IO.puts("1 status_for_url #{url}")
+    status = case Cachex.get(@cache_name, url) do
       {:ok, nil} -> :not_requested
       {:ok, :pending} -> :pending
       {:ok, {:ok, _zip_files}} -> :completed
       other -> other
     end
+    IO.puts("2 status_for_url #{url} = #{status}")
+    status
   end
 
   def result_for_url(url) do
