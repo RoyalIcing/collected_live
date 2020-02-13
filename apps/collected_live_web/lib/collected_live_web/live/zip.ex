@@ -157,6 +157,7 @@ defmodule CollectedLiveWeb.ZipLive do
   end
 
   def handle_info({:completed_download_for_url, url}, socket) do
+    IO.puts("handle_info :completed_download_for_url")
     archive = GitHubArchiveDownloader.result_for_url(url)
     {:noreply, assign(socket, :archive, archive)}
   end

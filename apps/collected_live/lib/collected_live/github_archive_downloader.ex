@@ -9,7 +9,9 @@ defmodule CollectedLive.GitHubArchiveDownloader do
     Cachex.put(@cache_name, url, :pending)
 
     Task.start(fn ->
+      IO.puts("begin http get url #{url}")
       result = HTTPClient.get(url)
+      IO.puts("end http get url #{url}")
 
       case result do
         {:ok, response} -> received_data_for_url(url, response.body)
@@ -19,19 +21,25 @@ defmodule CollectedLive.GitHubArchiveDownloader do
   end
 
   defp send_message_for_url(url, message) do
+    IO.puts("send_message_for_url #{url}")
     Registry.dispatch(__MODULE__, url, fn entries ->
+      IO.puts("sending message to #{entries}")
       for {pid, _} <- entries, do: send(pid, message)
     end)
   end
 
   defp received_data_for_url(url, data) when byte_size(data) == 0 do
+    IO.puts("received_data_for_url empty")
     Cachex.put(@cache_name, url, {:error, :empty})
+    IO.puts("put in cache #{url}")
 
     send_message_for_url(url, {:failed_download_for_url, url})
   end
 
   defp received_data_for_url(url, data) when is_binary(data) do
+    IO.puts("received_data_for_url has data")
     Cachex.put(@cache_name, url, {:ok, data})
+    IO.puts("put in cache #{url}")
 
     # Cachex.execute!(@cache_name, fn(cache) ->
     #   {:ok, zip_handle} = :zip.zip_open(data, [:memory])
