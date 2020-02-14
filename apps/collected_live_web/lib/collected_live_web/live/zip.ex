@@ -2,6 +2,7 @@ defmodule CollectedLiveWeb.ZipLive do
   use Phoenix.LiveView
   use Phoenix.HTML
   require Logger
+  alias Phoenix.LiveView.Socket
   alias CollectedLive.GitHubArchiveDownloader
   alias CollectedLive.Content.Archive
 
@@ -162,8 +163,11 @@ defmodule CollectedLiveWeb.ZipLive do
     {:noreply, assign(socket, :archive, archive)}
   end
 
-  def handle_event("select_zip_file", %{"name" => name}, socket) do
-    archive = socket.assigns[:archive]
+  def handle_event("select_zip_file", %{"name" => name}, socket = %Socket{ assigns: %{ archive: nil } }) do
+    {:noreply, socket}
+  end
+
+  def handle_event("select_zip_file", %{"name" => name}, socket = %Socket{ assigns: %{ archive: archive } }) do
     file_info = Archive.Zip.info_for_file_named(archive, name)
     file_content = Archive.Zip.content_for_file_named(archive, name)
 
