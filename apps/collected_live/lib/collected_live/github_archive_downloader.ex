@@ -11,7 +11,7 @@ defmodule CollectedLive.GitHubArchiveDownloader do
     Task.start(fn ->
       IO.puts("begin http get url #{url}")
       result = HTTPClient.get(url)
-      IO.puts("end http get url #{url}")
+      IO.puts("end http get url #{url} #{result}")
 
       case result do
         {:ok, response} -> received_data_for_url(url, response.body)
