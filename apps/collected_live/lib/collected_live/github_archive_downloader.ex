@@ -15,7 +15,7 @@ defmodule CollectedLive.GitHubArchiveDownloader do
 
       case result do
         {:ok, response} -> received_data_for_url(url, response.body)
-        _ -> ""
+        # _ -> ""
       end
     end)
   end
