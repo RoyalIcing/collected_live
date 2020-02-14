@@ -22,7 +22,7 @@ defmodule CollectedLive.GitHubArchiveDownloader do
   defp send_message_for_url(url, message) do
     IO.puts("send_message_for_url #{url}")
     Registry.dispatch(__MODULE__, url, fn entries ->
-      IO.puts("sending message to #{entries}")
+      IO.puts("sending message to #{inspect(entries)}")
       for {pid, _} <- entries, do: send(pid, message)
     end)
   end
