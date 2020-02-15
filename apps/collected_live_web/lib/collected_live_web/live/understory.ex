@@ -5,15 +5,95 @@ defmodule CollectedLiveWeb.UnderstoryLive do
   alias Phoenix.LiveView.Socket
 
   defmodule State do
-    defstruct source: ""
+    @default_source """
+@textbox
+value: jane@example.org
+.border
+.bg-white
+"""
+
+    defstruct source: @default_source
 
     def change_source(state = %State{}, new_source) when is_binary(new_source) do
       %State{state | source: new_source}
     end
   end
 
+  defmodule Parser do
+    defmodule Block do
+      defstruct type: :unknown, class: "", attributes: []
+
+      def from_lines(["@textbox" | tail]) do
+        %__MODULE__{type: :textbox} |> parse_options(tail)
+      end
+
+      def from_lines(_lines) do
+        %__MODULE__{}
+      end
+
+      defp add_class_name(block = %__MODULE__{class: ""}, class_name) do
+        %__MODULE__{block | class: class_name}
+      end
+
+      defp add_class_name(block = %__MODULE__{class: class}, class_name) do
+        %__MODULE__{block | class: "#{class} #{class_name}"}
+      end
+
+      defp parse_options(block, lines) do
+        Enum.reduce(lines, block, fn
+          "." <> class_name, block ->
+            add_class_name(block, class_name) |> IO.inspect(label: "class found")
+
+          _item, block ->
+            block
+        end)
+        |> IO.inspect(label: "parse_options")
+      end
+    end
+
+    def parse_string(source) when is_binary(source) do
+      # source |> String.split("\n") |> parse_lines()
+      source |> String.split(~r{\n\n+}, trim: true) |> Enum.map(&parse_block_string/1)
+    end
+
+    def parse_block_string(source) when is_binary(source) do
+      source |> String.split("\n", trim: true) |> Block.from_lines()
+    end
+  end
+
+  defmodule Preview do
+    alias Parser.Block
+
+    def present(blocks) do
+      # blocks |> Enum.map(&Preview.present_block/1)
+      blocks |> Enum.map(fn block -> present_block(block) end)
+    end
+
+    defp present_block(%Block{type: :textbox, class: class}) do
+      tag(:input, type: "text", class: class)
+    end
+
+    defp present_block(_) do
+      content_tag(:div, "Unknown")
+    end
+  end
+
   def mount(%{}, socket) do
     {:ok, assign(socket, state: %State{})}
+  end
+
+  defp present_source(source, :elements) do
+    source |> Parser.parse_string() |> Preview.present()
+  end
+
+  defp present_source(source, :html_source) do
+    elements = present_source(source, :elements)
+    html_source = elements
+      |> Enum.map(fn(element) -> element |> html_escape() |> safe_to_string() end)
+      |> Enum.join("\n\n")
+      |> html_escape()
+
+    content_tag(:pre, html_source, class: "text-sm whitespace-pre-wrap")
   end
 
   def render(assigns) do
@@ -23,25 +103,37 @@ defmodule CollectedLiveWeb.UnderstoryLive do
     # assigns = Map.put(assigns, :rows, max_row + 2)
 
     ~L"""
-    <div class="max-w-xl mx-auto">
+    <div class="max-w-3xl mx-auto">
       <div class="flex flex-row">
-        <%= form_tag "#", phx_change: "text-change", class: "flex-1" %>
-          <%= label do %>
-            <%= label_text "Define" %>
-            <%= textarea(:define, :source,
-              value: @state.source,
-              phx_hook: "Autofocusing",
-              rows: 20,
-              class: "block w-full m-1 px-3 py-2 text-base border")
-            %>
-          <% end %>
-        </form>
+        <div class="flex flex-row flex-grow">
+          <%= form_tag "#", phx_change: "text-change", class: "flex-1" %>
+            <%= label do %>
+              <%= label_text "Define" %>
+              <%= textarea(:define, :source,
+                value: @state.source,
+                phx_hook: "Autofocusing",
+                rows: 20,
+                class: "block w-full px-3 py-2 text-base border")
+              %>
+            <% end %>
+          </form>
+        </div>
+        <div class="w-1/2">
+          <%= label_text "Preview" %>
+          <div class="bg-gray-200 border border-l-0 p-4">
+          <%= @state.source |> present_source(:elements) %>
+          </div>
+        </div>
       </div>
     </div>
     """
   end
 
-  def handle_event("text-change", %{ "define" => %{ "source" => new_source } }, socket = %Socket{ assigns: %{ state: state } }) do
+  def handle_event(
+        "text-change",
+        %{"define" => %{"source" => new_source}},
+        socket = %Socket{assigns: %{state: state}}
+      ) do
     new_state = State.change_source(state, new_source)
     {:noreply, assign(socket, state: new_state)}
   end
