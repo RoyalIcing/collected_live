@@ -6,11 +6,14 @@ defmodule CollectedLiveWeb.UnderstoryLive do
 
   defmodule State do
     @default_source """
-@textbox
-value: jane@example.org
-.border
-.bg-white
-"""
+    @textbox jane@example.org
+    .block w-full px-1
+    .bg-white border
+
+    @button Sign in
+    .px-2 py-1
+    .bg-blue-500
+    """
 
     defstruct source: @default_source
 
@@ -21,10 +24,39 @@ value: jane@example.org
 
   defmodule Parser do
     defmodule Block do
-      defstruct type: :unknown, class: "", attributes: []
+      defstruct type: :unknown, children: "", class: "", attributes: []
+
+      def from_lines(["@textbox " <> rest | tail]) do
+        %__MODULE__{
+          type: :textbox,
+          attributes: [
+            value: rest |> String.trim()
+          ]
+        }
+        |> parse_options(tail)
+      end
 
       def from_lines(["@textbox" | tail]) do
-        %__MODULE__{type: :textbox} |> parse_options(tail)
+        %__MODULE__{
+          type: :textbox
+        }
+        |> parse_options(tail)
+      end
+
+      def from_lines(["@button " <> rest | tail]) do
+        %__MODULE__{
+          type: :button,
+          children: rest
+        }
+        |> parse_options(tail)
+      end
+
+      def from_lines(["@button" | tail]) do
+        %__MODULE__{
+          type: :button,
+          children: "Button"
+        }
+        |> parse_options(tail)
       end
 
       def from_lines(_lines) do
@@ -69,12 +101,16 @@ value: jane@example.org
       blocks |> Enum.map(fn block -> present_block(block) end)
     end
 
-    defp present_block(%Block{type: :textbox, class: class}) do
-      tag(:input, type: "text", class: class)
+    defp present_block(%Block{type: :textbox, class: class, attributes: attributes}) do
+      tag(:input, attributes ++ [type: "text", class: class])
+    end
+
+    defp present_block(%Block{type: :button, class: class, children: children}) do
+      content_tag(:button, children, class: class)
     end
 
     defp present_block(_) do
-      content_tag(:div, "Unknown")
+      content_tag(:div, "")
     end
   end
 
@@ -83,13 +119,18 @@ value: jane@example.org
   end
 
   defp present_source(source, :elements) do
-    source |> Parser.parse_string() |> Preview.present()
+    source
+    |> Parser.parse_string()
+    |> Preview.present()
+    |> Enum.map(fn el -> content_tag(:div, el, class: "py-2") end)
   end
 
   defp present_source(source, :html_source) do
-    elements = present_source(source, :elements)
-    html_source = elements
-      |> Enum.map(fn(element) -> element |> html_escape() |> safe_to_string() end)
+    elements = source |> Parser.parse_string() |> Preview.present()
+
+    html_source =
+      elements
+      |> Enum.map(fn element -> element |> html_escape() |> safe_to_string() end)
       |> Enum.join("\n\n")
       |> html_escape()
 
@@ -113,7 +154,7 @@ value: jane@example.org
                 value: @state.source,
                 phx_hook: "Autofocusing",
                 rows: 20,
-                class: "block w-full px-3 py-2 text-base border")
+                class: "block w-full px-3 py-2 font-mono text-base border")
               %>
             <% end %>
           </form>
