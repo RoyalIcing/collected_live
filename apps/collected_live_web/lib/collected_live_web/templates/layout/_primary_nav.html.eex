@@ -1,0 +1,9 @@
+<nav role="navigation" class="max-w-3xl">
+  <ul class="flex flex-row">
+    <li><a class="block px-3 py-2" href="/weave">Weave</a></li>
+    <li><a class="block px-3 py-2" href="/search/code">Search Code</a></li>
+    <li><a class="block px-3 py-2" href="/svg">Search Icons</a></li>
+    <%# <li><a class="block px-3 py-2" href="/text">Text</a></li> %>
+    <%# <li><a class="block px-3 py-2" href="/text/new">Write</a></li> %>
+  </ul>
+</nav>
