@@ -94,7 +94,7 @@ defmodule CollectedLiveWeb.Components.WeaveRow do
             value: @url,
             id: "weave-link-#{@row}",
             phx_hook: "Autofocusing",
-            class: "block w-full m-1 px-3 py-2 border")
+            class: "block w-full m-1 px-3 py-2 text-sm border")
           %>
         <% end %>
       </form>

@@ -14,8 +14,11 @@ defmodule CollectedLiveWeb.Components.LinkPreview do
 
     ~L"""
     <div>
-      YouTube Video ID: <%= query_vars["v"] %>
-      <lite-youtube videoid='<%= query_vars["v"] %>'></lite-youtube>
+      YouTube Video
+      <%= case query_vars["v"] do
+        nil -> content_tag(:p, "Missing id of video")
+        id -> content_tag(:"lite-video", "", videoid: id)
+      end %>
     </div>
     """
   end
