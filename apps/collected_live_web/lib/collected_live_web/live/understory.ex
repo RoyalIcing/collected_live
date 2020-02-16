@@ -12,7 +12,8 @@ defmodule CollectedLiveWeb.UnderstoryLive do
     - @link Sign in
     - @link Join
 
-    @textbox jane@example.org
+    @textbox Email
+    [value] jane@example.org
     .block w-full px-1
     .bg-white border
 
@@ -71,9 +72,7 @@ defmodule CollectedLiveWeb.UnderstoryLive do
       def from_lines(["@textbox " <> rest | tail]) do
         %__MODULE__{
           type: :textbox,
-          attributes: [
-            value: rest |> String.trim()
-          ]
+          children: [rest |> String.trim()]
         }
         |> parse_options(tail)
       end
@@ -153,6 +152,10 @@ defmodule CollectedLiveWeb.UnderstoryLive do
         %__MODULE__{block | list_items: list_items ++ [parsed_item]}
       end
 
+      defp add_attribute(block = %__MODULE__{attributes: attributes}, name, value) do
+        %__MODULE__{block | attributes: attributes ++ [{name, value}]}
+      end
+
       defp parse_options(block, lines) do
         Enum.reduce(lines, block, fn
           "." <> class_name, block ->
@@ -160,6 +163,13 @@ defmodule CollectedLiveWeb.UnderstoryLive do
 
           "-" <> content, block ->
             add_list_item(block, content |> String.trim_leading())
+
+          "[" <> attr, block ->
+            case Regex.run(~r/(.+)\]\s*(.*)/, attr) do
+              [_, name, ""] -> add_attribute(block, name, true)
+              [_, name, value] -> add_attribute(block, name, value)
+              _ -> block
+            end
 
           _item, block ->
             block
@@ -222,8 +232,17 @@ defmodule CollectedLiveWeb.UnderstoryLive do
       content_tag(:span, always_space(children), tidy_attributes(attributes, class))
     end
 
-    defp present_block(%Block{type: :textbox, class: class, attributes: attributes}) do
-      tag(:input, tidy_attributes(attributes, class) ++ [type: "text"])
+    defp present_block(%Block{
+           type: :textbox,
+           children: children,
+           attributes: attributes,
+           class: class
+         }) do
+      content_tag(:label, [
+        content_tag(:span, children),
+        tag(:input, tidy_attributes(attributes, class) ++ [type: "text"])
+      ])
+    end
     end
 
     defp present_block(%Block{
