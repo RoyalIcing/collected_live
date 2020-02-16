@@ -192,33 +192,47 @@ defmodule CollectedLiveWeb.UnderstoryLive do
       blocks |> Enum.map(fn block -> present_block(block) end)
     end
 
+    @new_line raw("\n")
+
     defp always_space([""]), do: [raw("&nbsp;")]
     defp always_space(items), do: items
+
+    defp tidy_attributes(attributes, class) do
+      case class do
+        "" -> attributes
+        s -> attributes ++ [class: s]
+      end
+    end
 
     defp present_block(%Block{
            type: :link,
            children: children,
-           class: class,
-           attributes: attributes
+           attributes: attributes,
+           class: class
          }) do
-      content_tag(:a, always_space(children), attributes ++ [class: class])
+      content_tag(:a, always_space(children), tidy_attributes(attributes, class))
     end
 
     defp present_block(%Block{
            type: :text,
            children: children,
-           class: class,
-           attributes: attributes
+           attributes: attributes,
+           class: class
          }) do
-      content_tag(:span, always_space(children), attributes ++ [class: class])
+      content_tag(:span, always_space(children), tidy_attributes(attributes, class))
     end
 
     defp present_block(%Block{type: :textbox, class: class, attributes: attributes}) do
-      tag(:input, attributes ++ [type: "text", class: class])
+      tag(:input, tidy_attributes(attributes, class) ++ [type: "text"])
     end
 
-    defp present_block(%Block{type: :button, children: children, class: class}) do
-      content_tag(:button, always_space(children), class: class)
+    defp present_block(%Block{
+           type: :button,
+           children: children,
+           attributes: attributes,
+           class: class
+         }) do
+      content_tag(:button, always_space(children), tidy_attributes(attributes, class))
     end
 
     defp present_block(%Block{
@@ -230,11 +244,15 @@ defmodule CollectedLiveWeb.UnderstoryLive do
       presented_list_items =
         list_items
         |> Enum.map(fn item ->
-          content_tag(:li, item |> present_block())
+          [content_tag(:li, item |> present_block()), @new_line]
         end)
 
-      content_tag(:nav, attributes ++ [class: class]) do
-        content_tag(:ul, presented_list_items)
+      content_tag(:nav, tidy_attributes(attributes, class)) do
+        [
+          @new_line,
+          content_tag(:ul, [@new_line, presented_list_items]),
+          @new_line
+        ]
       end
     end
 
