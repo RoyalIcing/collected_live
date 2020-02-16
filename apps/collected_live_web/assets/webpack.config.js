@@ -44,12 +44,12 @@ module.exports = (env, options) => ({
             options: {
               ident: "postcss",
               plugins: [
-                require("tailwindcss"),
                 require("postcss-import")({
                   // root: Path.resolve(__dirname, "css")
                   path: [Path.resolve(__dirname, "css")]
                   //
                 }),
+                require("tailwindcss"),
                 require("autoprefixer")
               ]
             }
