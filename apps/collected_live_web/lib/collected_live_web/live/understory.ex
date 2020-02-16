@@ -21,6 +21,11 @@ defmodule CollectedLiveWeb.UnderstoryLive do
     @checkbox Remember me
 
     @button Sign in
+
+    @radiogroup Choose
+    - First
+    - Second
+    - Third
     """
 
     defstruct source: @default_source,
@@ -83,10 +88,10 @@ defmodule CollectedLiveWeb.UnderstoryLive do
 
       def from_lines(["@textbox" | tail]), do: from_lines(["@textbox " | tail])
 
-      def from_lines(["@checkbox " <> rest | tail]) do
+      def from_lines(["@checkbox " <> label | tail]) do
         %__MODULE__{
           type: :checkbox,
-          children: [rest |> String.trim()]
+          children: [label |> String.trim()]
         }
         |> parse_options(tail)
       end
@@ -112,6 +117,17 @@ defmodule CollectedLiveWeb.UnderstoryLive do
       end
 
       def from_lines(["@navigation" | tail]), do: from_lines(["@navigation " | tail])
+
+      def from_lines(["@radiogroup " <> label | tail]) do
+        %__MODULE__{
+          type: :radiogroup,
+          attributes: [role: "radiogroup"],
+          children: [label |> String.trim()]
+        }
+        |> parse_options(tail, list_mode: :text)
+      end
+
+      def from_lines(["@radiogroup" | tail]), do: from_lines(["@radiogroup " | tail])
 
       def from_lines(["@" <> unknown_role]) do
         %__MODULE__{
@@ -145,22 +161,28 @@ defmodule CollectedLiveWeb.UnderstoryLive do
         %__MODULE__{block | class: "#{class} #{class_name}"}
       end
 
-      defp add_list_item(block = %__MODULE__{list_items: list_items}, raw_item) do
-        parsed_item = from_lines([raw_item])
+      defp add_list_item(block = %__MODULE__{list_items: list_items}, :parse, item) do
+        parsed_item = from_lines([item])
         %__MODULE__{block | list_items: list_items ++ [parsed_item]}
+      end
+
+      defp add_list_item(block = %__MODULE__{list_items: list_items}, :text, item) do
+        %__MODULE__{block | list_items: list_items ++ [item]}
       end
 
       defp add_attribute(block = %__MODULE__{attributes: attributes}, name, value) do
         %__MODULE__{block | attributes: attributes ++ [{name, value}]}
       end
 
-      defp parse_options(block, lines) do
+      defp parse_options(block, lines, options \\ []) do
+        list_mode = Keyword.get(options, :list_mode, :parse)
+
         Enum.reduce(lines, block, fn
           "." <> class_name, block ->
             add_class_name(block, class_name)
 
           "-" <> content, block ->
-            add_list_item(block, content |> String.trim_leading())
+            add_list_item(block, list_mode, content |> String.trim_leading())
 
           "[" <> attr, block ->
             case Regex.run(~r/(.+)\]\s*(.*)/, attr) do
@@ -281,7 +303,10 @@ defmodule CollectedLiveWeb.UnderstoryLive do
       presented_list_items =
         list_items
         |> Enum.map(fn item ->
-          [content_tag(:li, item |> present_block()), @new_line]
+          [
+            content_tag(:li, item |> present_block()),
+            @new_line
+          ]
         end)
 
       content_tag(:nav, tidy_attributes(attributes, class)) do
@@ -289,6 +314,35 @@ defmodule CollectedLiveWeb.UnderstoryLive do
           @new_line,
           content_tag(:ul, [@new_line, presented_list_items]),
           @new_line
+        ]
+      end
+    end
+
+    defp present_block(%Block{
+           type: :radiogroup,
+           children: children,
+           list_items: list_items,
+           attributes: attributes,
+           class: class
+         }) do
+      presented_list_items =
+        list_items
+        |> Enum.map(fn choice_label ->
+          [
+            content_tag(:label, [
+              tag(:input, type: "radio"),
+              content_tag(:span, choice_label)
+            ]),
+            @new_line
+          ]
+        end)
+
+      content_tag(:div, tidy_attributes(attributes, class)) do
+        [
+          @new_line,
+          content_tag(:h3, [children]),
+          @new_line,
+          presented_list_items
         ]
       end
     end
@@ -335,7 +389,7 @@ defmodule CollectedLiveWeb.UnderstoryLive do
               <%= textarea(:define, :source,
                 value: @state.source,
                 phx_hook: "Autofocusing",
-                rows: 20,
+                rows: 30,
                 class: "block w-full px-3 py-2 font-mono text-base border")
               %>
             <% end %>

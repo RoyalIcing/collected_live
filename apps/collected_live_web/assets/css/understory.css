@@ -50,3 +50,10 @@
 .UnderstoryPreview input[type=checkbox]:not([class]) {
   @apply mr-2;
 }
+
+.UnderstoryPreview [role=radiogroup]:not([class]) label {
+  @apply block;
+}
+.UnderstoryPreview [role=radiogroup]:not([class]) input[type=radio] {
+  @apply mr-2;
+}
