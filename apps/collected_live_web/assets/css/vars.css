@@ -5,6 +5,9 @@ a:hover {
 }
 
 a {
+  display: var(--link--display);
+  padding-top: var(--link--padding-top);
+  padding-bottom: var(--link--padding-bottom);
   padding-left: var(--link--padding-left);
   padding-right: var(--link--padding-right);
 }

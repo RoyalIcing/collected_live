@@ -388,7 +388,7 @@ defmodule CollectedLiveWeb.UnderstoryLive do
               <% end %>
             </form>
           </div>
-          <div class="UnderstoryPreview bg-gray-200 border border-l-0 p-4 @link:hover:underline">
+          <div class="UnderstoryPreview bg-gray-200 border border-l-0 @link:hover:underline">
             <%= @state.source |> present_source(@state.preview) %>
           </div>
         </div>
