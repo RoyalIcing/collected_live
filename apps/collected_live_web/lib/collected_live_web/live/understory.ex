@@ -129,7 +129,10 @@ defmodule CollectedLiveWeb.UnderstoryLive do
 
     def parse_string(source) when is_binary(source) do
       # source |> String.split("\n") |> parse_lines()
-      source |> convert_line_endings_to_line_feed |> String.split(~r{\n\n+}, trim: true) |> Enum.map(&parse_block_string/1)
+      source
+      |> convert_line_endings_to_line_feed
+      |> String.split(~r{\n\n+}, trim: true)
+      |> Enum.map(&parse_block_string/1)
     end
 
     def parse_block_string(source) when is_binary(source) do
@@ -145,13 +148,8 @@ defmodule CollectedLiveWeb.UnderstoryLive do
       blocks |> Enum.map(fn block -> present_block(block) end)
     end
 
-    defp always_space([""]) do
-      [raw("&nbsp;")]
-    end
-
-    defp always_space(items) do
-      items
-    end
+    defp always_space([""]), do: [raw("&nbsp;")]
+    defp always_space(items), do: items
 
     defp present_block(%Block{type: :textbox, class: class, attributes: attributes}) do
       tag(:input, attributes ++ [type: "text", class: class])
