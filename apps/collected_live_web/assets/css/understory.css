@@ -1,0 +1,22 @@
+:root {
+  --red-500: #f56565;
+}
+
+*[class*="--bg:"] {
+  background: var(--bg) !important;
+}
+
+.--bg\:red-500 {
+  --bg: var(--red-500);
+}
+
+.UnderstoryPreview {
+}
+
+.UnderstoryPreview button:not([class]) {
+  @apply px-2 py-1 bg-blue-500;
+}
+
+.UnderstoryPreview input[type=text]:not([class]) {
+  @apply block w-full px-1 bg-white border;
+}
