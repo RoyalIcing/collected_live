@@ -7,12 +7,13 @@ defmodule CollectedLiveWeb.UnderstoryLive do
   defmodule State do
     @default_source """
     @navigation Primary
+    - @heading ACME
     - @link Features
     - @link Pricing
     - @link Sign in
     - @link Join
 
-    @heading Sign in
+    @heading Sign into ACME
 
     @textbox Email
     [value] jane@example.org
