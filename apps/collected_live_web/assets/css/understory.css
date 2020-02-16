@@ -39,7 +39,7 @@
 }
 
 .UnderstoryPreview button:not([class]) {
-  @apply px-2 py-1 bg-blue-400 rounded-sm;
+  @apply px-2 py-1 bg-blue-300 border border-blue-400 rounded-sm;
 }
 
 .UnderstoryPreview input[type=text]:not([class]),

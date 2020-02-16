@@ -404,7 +404,7 @@ defmodule CollectedLiveWeb.UnderstoryLive do
             <%= label do %>
               <div class="mb-4">
                 <%= label_text "Define" %>
-                <%= content_tag(:button, "Make Markdown", class: "text-sm mx-1 px-1 bg-yellow-300 border border-yellow-400 rounded") %>
+                <%= content_tag(:button, "Make Markdown", class: "text-sm mx-1 px-1 text-orange-900 bg-orange-300 border border-orange-400 rounded") %>
               </div>
               <%= textarea(:define, :source,
                 value: @state.source,

@@ -1,6 +1,8 @@
 <div class="px-3">
-  <header class="max-w-3xl mx-auto py-4">
-    <h1 class="text-4xl"><%= gettext "%{name}", name: "Understory: Accessibility-First Design" %></h1>
+  <header class="max-w-3xl mx-auto pt-4 pb-6 text-center">
+    <h1 class="text-3xl">
+      <strong>Understory:</strong> Accessibility-First Design
+    </h1>
   </header>
 </div>
 
