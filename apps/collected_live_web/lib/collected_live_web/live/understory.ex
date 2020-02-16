@@ -14,12 +14,10 @@ defmodule CollectedLiveWeb.UnderstoryLive do
 
     @textbox Email
     [value] jane@example.org
-    .block w-full px-1
-    .bg-white border
+
+    @checkbox Remember me
 
     @button Sign in
-    .px-2 py-1
-    .bg-blue-500
     """
 
     defstruct source: @default_source,
@@ -363,7 +361,7 @@ defmodule CollectedLiveWeb.UnderstoryLive do
               <% end %>
             </form>
           </div>
-          <div class="UnderstoryPreview bg-gray-200 border border-l-0 p-4 var:underline-hovered-links">
+          <div class="UnderstoryPreview bg-gray-200 border border-l-0 p-4 var:link-hover-underline">
             <%= @state.source |> present_source(@state.preview) %>
           </div>
         </div>

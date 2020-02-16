@@ -13,10 +13,21 @@
 .UnderstoryPreview {
 }
 
+.UnderstoryPreview nav:not([class]) ul {
+  --link-padding-left: 0.5rem;
+  --link-padding-right: 0.5rem;
+
+  @apply flex flex-row;
+}
+
 .UnderstoryPreview button:not([class]) {
-  @apply px-2 py-1 bg-blue-500;
+  @apply px-2 py-1 bg-blue-400 rounded-sm;
 }
 
 .UnderstoryPreview input[type=text]:not([class]) {
   @apply block w-full px-1 bg-white border;
+}
+
+.UnderstoryPreview input[type=checkbox]:not([class]) {
+  @apply mr-2;
 }

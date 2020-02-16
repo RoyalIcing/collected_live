@@ -1,17 +1,22 @@
 /* Var consumers */
 
 a:hover {
-  text-decoration: var(--hover-text-decoration);
+  text-decoration: var(--link-hover-text-decoration);
+}
+
+a {
+  padding-left: var(--link-padding-left);
+  padding-right: var(--link-padding-right);
 }
 
 /* Defaults */
 
 article {
-  --hover-text-decoration: underline;
+  --link-hover-text-decoration: underline;
 }
 
 /* Var utilities */
 
-.var\:underline-hovered-links {
-  --hover-text-decoration: underline;
+.var\:link-hover-underline {
+  --link-hover-text-decoration: underline;
 }
