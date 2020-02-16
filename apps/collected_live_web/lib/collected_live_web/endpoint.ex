@@ -47,6 +47,6 @@ defmodule CollectedLiveWeb.Endpoint do
     websocket: [connect_info: [session: @session_options]]
 
   socket "/socket", CollectedLiveWeb.UserSocket,
-    websocket: [connect_info: [session: @session_options]]
+    websocket: true,
     longpoll: false
 end
