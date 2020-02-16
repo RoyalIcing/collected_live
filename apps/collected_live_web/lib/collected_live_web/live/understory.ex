@@ -73,7 +73,7 @@ defmodule CollectedLiveWeb.UnderstoryLive do
       def from_lines(["@button" | tail]) do
         %__MODULE__{
           type: :button,
-          children: "Button"
+          children: ["Button"]
         }
         |> parse_options(tail)
       end
@@ -145,12 +145,20 @@ defmodule CollectedLiveWeb.UnderstoryLive do
       blocks |> Enum.map(fn block -> present_block(block) end)
     end
 
+    defp always_space([""]) do
+      [raw("&nbsp;")]
+    end
+
+    defp always_space(items) do
+      items
+    end
+
     defp present_block(%Block{type: :textbox, class: class, attributes: attributes}) do
       tag(:input, attributes ++ [type: "text", class: class])
     end
 
     defp present_block(%Block{type: :button, children: children, class: class}) do
-      content_tag(:button, children, class: class)
+      content_tag(:button, always_space(children), class: class)
     end
 
     defp present_block(%Block{
