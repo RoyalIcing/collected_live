@@ -18,8 +18,8 @@
 }
 
 .UnderstoryPreview nav:not([class]) ul {
-  --link-padding-left: 0.5rem;
-  --link-padding-right: 0.5rem;
+  --link--padding-left: 0.5rem;
+  --link--padding-right: 0.5rem;
 
   @apply flex flex-row;
 }
