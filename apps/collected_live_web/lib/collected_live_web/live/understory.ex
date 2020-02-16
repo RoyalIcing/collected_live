@@ -84,6 +84,21 @@ defmodule CollectedLiveWeb.UnderstoryLive do
         |> parse_options(tail)
       end
 
+      def from_lines(["@checkbox " <> rest | tail]) do
+        %__MODULE__{
+          type: :checkbox,
+          children: [rest |> String.trim()]
+        }
+        |> parse_options(tail)
+      end
+
+      def from_lines(["@checkbox" | tail]) do
+        %__MODULE__{
+          type: :checkbox
+        }
+        |> parse_options(tail)
+      end
+
       def from_lines(["@button " <> title | tail]) do
         %__MODULE__{
           type: :button,
@@ -243,6 +258,17 @@ defmodule CollectedLiveWeb.UnderstoryLive do
         tag(:input, tidy_attributes(attributes, class) ++ [type: "text"])
       ])
     end
+
+    defp present_block(%Block{
+           type: :checkbox,
+           children: children,
+           attributes: attributes,
+           class: class
+         }) do
+      content_tag(:label, [
+        tag(:input, tidy_attributes(attributes, class) ++ [type: "checkbox"]),
+        content_tag(:span, children)
+      ])
     end
 
     defp present_block(%Block{
