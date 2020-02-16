@@ -1,0 +1,17 @@
+/* Var consumers */
+
+a:hover {
+  text-decoration: var(--hover-text-decoration);
+}
+
+/* Defaults */
+
+article {
+  --hover-text-decoration: underline;
+}
+
+/* Var utilities */
+
+.var\:underline-hovered-links {
+  --hover-text-decoration: underline;
+}

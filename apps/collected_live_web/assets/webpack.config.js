@@ -1,4 +1,4 @@
-const path = require("path");
+const Path = require("path");
 const glob = require("glob");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const UglifyJsPlugin = require("uglifyjs-webpack-plugin");
@@ -18,7 +18,7 @@ module.exports = (env, options) => ({
   },
   output: {
     filename: "app.js",
-    path: path.resolve(__dirname, "../priv/static/js")
+    path: Path.resolve(__dirname, "../priv/static/js")
   },
   module: {
     rules: [
@@ -45,6 +45,11 @@ module.exports = (env, options) => ({
               ident: "postcss",
               plugins: [
                 require("tailwindcss"),
+                require("postcss-import")({
+                  // root: Path.resolve(__dirname, "css")
+                  path: [Path.resolve(__dirname, "css")]
+                  //
+                }),
                 require("autoprefixer")
               ]
             }
