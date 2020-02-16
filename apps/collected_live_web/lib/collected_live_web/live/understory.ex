@@ -12,6 +12,8 @@ defmodule CollectedLiveWeb.UnderstoryLive do
     - @link Sign in
     - @link Join
 
+    @heading Sign in
+
     @textbox Email
     [value] jane@example.org
 
@@ -48,6 +50,22 @@ defmodule CollectedLiveWeb.UnderstoryLive do
                 class: "",
                 attributes: [],
                 errors: []
+
+      def from_lines(["@heading " <> text | tail]) do
+        %__MODULE__{
+          type: :heading,
+          children: [text]
+        }
+        |> parse_options(tail)
+      end
+
+      def from_lines(["@heading" | tail]) do
+        %__MODULE__{
+          type: :heading,
+          children: ["Heading"]
+        }
+        |> parse_options(tail)
+      end
 
       def from_lines(["@link " <> text | tail]) do
         %__MODULE__{
@@ -225,6 +243,15 @@ defmodule CollectedLiveWeb.UnderstoryLive do
         "" -> attributes
         s -> attributes ++ [class: s]
       end
+    end
+
+    defp present_block(%Block{
+           type: :heading,
+           children: children,
+           attributes: attributes,
+           class: class
+         }) do
+      content_tag(:h2, always_space(children), tidy_attributes(attributes, class))
     end
 
     defp present_block(%Block{

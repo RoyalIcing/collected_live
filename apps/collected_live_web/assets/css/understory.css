@@ -13,6 +13,10 @@
 .UnderstoryPreview {
 }
 
+.UnderstoryPreview h2:not([class]) {
+  @apply text-2xl;
+}
+
 .UnderstoryPreview nav:not([class]) ul {
   --link-padding-left: 0.5rem;
   --link-padding-right: 0.5rem;
@@ -24,7 +28,8 @@
   @apply px-2 py-1 bg-blue-400 rounded-sm;
 }
 
-.UnderstoryPreview input[type=text]:not([class]) {
+.UnderstoryPreview input[type=text]:not([class]),
+.UnderstoryPreview input[type=password]:not([class]) {
   @apply block w-full px-1 bg-white border;
 }
 
