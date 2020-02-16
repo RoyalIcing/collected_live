@@ -43,7 +43,7 @@ defmodule CollectedLiveWeb.UnderstoryLive do
 
   defmodule Parser do
     defmodule Block do
-      defstruct type: :unknown, children: [], class: "", attributes: []
+      defstruct type: :unknown, children: [], class: "", attributes: [], errors: []
 
       def from_lines(["@textbox " <> rest | tail]) do
         %__MODULE__{
@@ -89,6 +89,26 @@ defmodule CollectedLiveWeb.UnderstoryLive do
       def from_lines(["@navigation" | tail]) do
         %__MODULE__{
           type: :navigation
+        }
+        |> parse_options(tail)
+      end
+
+      def from_lines(["@" <> unknown_role]) do
+        %__MODULE__{
+          type: :unknown,
+          errors: [
+            case unknown_role do
+              "" -> "Missing role"
+              s -> "Unknown role: #{s}"
+            end
+          ]
+        }
+      end
+
+      def from_lines([text | tail]) do
+        %__MODULE__{
+          type: :text,
+          children: [text]
         }
         |> parse_options(tail)
       end
@@ -151,6 +171,15 @@ defmodule CollectedLiveWeb.UnderstoryLive do
     defp always_space([""]), do: [raw("&nbsp;")]
     defp always_space(items), do: items
 
+    defp present_block(%Block{
+           type: :text,
+           children: children,
+           class: class,
+           attributes: attributes
+         }) do
+      content_tag(:span, always_space(children), attributes ++ [class: class])
+    end
+
     defp present_block(%Block{type: :textbox, class: class, attributes: attributes}) do
       tag(:input, attributes ++ [type: "text", class: class])
     end
@@ -172,8 +201,8 @@ defmodule CollectedLiveWeb.UnderstoryLive do
       end
     end
 
-    defp present_block(_) do
-      content_tag(:div, "")
+    defp present_block(%Block{errors: errors}) do
+      content_tag(:div, errors, class: "italic")
     end
   end
 
