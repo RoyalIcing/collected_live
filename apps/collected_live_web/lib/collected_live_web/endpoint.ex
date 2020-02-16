@@ -1,12 +1,6 @@
 defmodule CollectedLiveWeb.Endpoint do
   use Phoenix.Endpoint, otp_app: :collected_live_web
 
-  socket "/live", Phoenix.LiveView.Socket
-
-  socket "/socket", CollectedLiveWeb.UserSocket,
-    websocket: true,
-    longpoll: false
-
   # Serve at "/" the static files from "priv/static" directory.
   #
   # You should set gzip to true if you are running phx.digest
@@ -36,13 +30,23 @@ defmodule CollectedLiveWeb.Endpoint do
   plug Plug.MethodOverride
   plug Plug.Head
 
-  # The session will be stored in the cookie and signed,
-  # this means its contents can be read but not tampered with.
-  # Set :encryption_salt if you would also like to encrypt it.
-  plug Plug.Session,
+  @session_options [
     store: :cookie,
     key: "_collected_live_web_key",
     signing_salt: "VQAmPv+f"
+  ]
+
+  # The session will be stored in the cookie and signed,
+  # this means its contents can be read but not tampered with.
+  # Set :encryption_salt if you would also like to encrypt it.
+  plug Plug.Session, @session_options
 
   plug CollectedLiveWeb.Router
+
+  socket "/live", Phoenix.LiveView.Socket,
+    websocket: [connect_info: [session: @session_options]]
+
+  socket "/socket", CollectedLiveWeb.UserSocket,
+    websocket: [connect_info: [session: @session_options]]
+    longpoll: false
 end

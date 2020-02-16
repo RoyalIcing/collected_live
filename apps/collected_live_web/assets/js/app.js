@@ -29,7 +29,13 @@ const hooks = {
   }
 };
 
-let liveSocket = new LiveSocket("/live", Socket, { hooks });
+const csrfToken = document
+  .querySelector("meta[name='csrf-token']")
+  .getAttribute("content");
+const liveSocket = new LiveSocket("/live", Socket, {
+  params: { _csrf_token: csrfToken },
+  hooks
+});
 liveSocket.connect();
 
 import Vue from "vue";
