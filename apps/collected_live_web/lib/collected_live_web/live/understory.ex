@@ -6,6 +6,12 @@ defmodule CollectedLiveWeb.UnderstoryLive do
 
   defmodule State do
     @default_source """
+    @navigation Primary
+    - Features
+    - Pricing
+    - Sign in
+    - Join
+
     @textbox jane@example.org
     .block w-full px-1
     .bg-white border
@@ -15,16 +21,24 @@ defmodule CollectedLiveWeb.UnderstoryLive do
     .bg-blue-500
     """
 
-    defstruct source: @default_source
+    defstruct source: @default_source,
+              preview: :elements
 
     def change_source(state = %State{}, new_source) when is_binary(new_source) do
       %State{state | source: new_source}
+
+    def change_preview_to_elements(state = %State{}) do
+      %State{state | preview: :elements}
+    end
+
+    def change_preview_to_html(state = %State{}) do
+      %State{state | preview: :html}
     end
   end
 
   defmodule Parser do
     defmodule Block do
-      defstruct type: :unknown, children: "", class: "", attributes: []
+      defstruct type: :unknown, children: [], class: "", attributes: []
 
       def from_lines(["@textbox " <> rest | tail]) do
         %__MODULE__{
@@ -43,10 +57,10 @@ defmodule CollectedLiveWeb.UnderstoryLive do
         |> parse_options(tail)
       end
 
-      def from_lines(["@button " <> rest | tail]) do
+      def from_lines(["@button " <> title | tail]) do
         %__MODULE__{
           type: :button,
-          children: rest
+          children: [title]
         }
         |> parse_options(tail)
       end
@@ -55,6 +69,21 @@ defmodule CollectedLiveWeb.UnderstoryLive do
         %__MODULE__{
           type: :button,
           children: "Button"
+        }
+        |> parse_options(tail)
+      end
+
+      def from_lines(["@navigation " <> label | tail]) do
+        %__MODULE__{
+          type: :navigation,
+          attributes: ["aria-label": label]
+        }
+        |> parse_options(tail)
+      end
+
+      def from_lines(["@navigation" | tail]) do
+        %__MODULE__{
+          type: :navigation
         }
         |> parse_options(tail)
       end
@@ -71,21 +100,31 @@ defmodule CollectedLiveWeb.UnderstoryLive do
         %__MODULE__{block | class: "#{class} #{class_name}"}
       end
 
+      defp add_item(block = %__MODULE__{children: children}, item) do
+        %__MODULE__{block | children: children ++ [item]}
+      end
+
       defp parse_options(block, lines) do
         Enum.reduce(lines, block, fn
           "." <> class_name, block ->
-            add_class_name(block, class_name) |> IO.inspect(label: "class found")
+            add_class_name(block, class_name)
+
+          "-" <> content, block ->
+            add_item(block, content)
 
           _item, block ->
             block
         end)
-        |> IO.inspect(label: "parse_options")
       end
+    end
+
+    defp convert_line_endings_to_line_feed(source) when is_binary(source) do
+      source |> String.replace(~r/\r\n/, "\n")
     end
 
     def parse_string(source) when is_binary(source) do
       # source |> String.split("\n") |> parse_lines()
-      source |> String.split(~r{\n\n+}, trim: true) |> Enum.map(&parse_block_string/1)
+      source |> convert_line_endings_to_line_feed |> String.split(~r{\n\n+}, trim: true) |> Enum.map(&parse_block_string/1)
     end
 
     def parse_block_string(source) when is_binary(source) do
@@ -105,8 +144,21 @@ defmodule CollectedLiveWeb.UnderstoryLive do
       tag(:input, attributes ++ [type: "text", class: class])
     end
 
-    defp present_block(%Block{type: :button, class: class, children: children}) do
+    defp present_block(%Block{type: :button, children: children, class: class}) do
       content_tag(:button, children, class: class)
+    end
+
+    defp present_block(%Block{
+           type: :navigation,
+           children: children,
+           attributes: attributes,
+           class: class
+         }) do
+      list_items = children |> Enum.map(&content_tag(:li, &1))
+
+      content_tag(:nav, attributes ++ [class: class]) do
+        content_tag(:ul, list_items)
+      end
     end
 
     defp present_block(_) do
@@ -125,7 +177,7 @@ defmodule CollectedLiveWeb.UnderstoryLive do
     |> Enum.map(fn el -> content_tag(:div, el, class: "py-2") end)
   end
 
-  defp present_source(source, :html_source) do
+  defp present_source(source, :html) do
     elements = source |> Parser.parse_string() |> Preview.present()
 
     html_source =
@@ -138,8 +190,6 @@ defmodule CollectedLiveWeb.UnderstoryLive do
   end
 
   def render(assigns) do
-    state = assigns.state
-
     # assigns = Map.put(assigns, :cols, col_count)
     # assigns = Map.put(assigns, :rows, max_row + 2)
 
@@ -160,9 +210,21 @@ defmodule CollectedLiveWeb.UnderstoryLive do
           </form>
         </div>
         <div class="w-1/2">
-          <%= label_text "Preview" %>
+          <div>
+            <%= label_text "Preview" %>
+            <%= form_tag "#", phx_change: "preview-mode-change", class: "inline-block" %>
+              <%= label(class: "text-sm px-1") do %>
+                <%= radio_button(:preview, :preview_mode, "elements", checked: @state.preview == :elements) %>
+                Elements
+              <% end %>
+              <%= label(class: "text-sm px-1") do %>
+                <%= radio_button(:preview, :preview_mode, "html", checked: @state.preview == :html) %>
+                HTML
+              <% end %>
+            </form>
+          </div>
           <div class="bg-gray-200 border border-l-0 p-4">
-          <%= @state.source |> present_source(:elements) %>
+            <%= @state.source |> present_source(@state.preview) %>
           </div>
         </div>
       </div>
@@ -176,6 +238,21 @@ defmodule CollectedLiveWeb.UnderstoryLive do
         socket = %Socket{assigns: %{state: state}}
       ) do
     new_state = State.change_source(state, new_source)
+    {:noreply, assign(socket, state: new_state)}
+  end
+
+  def handle_event(
+        "preview-mode-change",
+        %{"preview" => %{"preview_mode" => new_preview_mode}},
+        socket = %Socket{assigns: %{state: state}}
+      ) do
+    new_state =
+      case new_preview_mode do
+        "elements" -> State.change_preview_to_elements(state)
+        "html" -> State.change_preview_to_html(state)
+        _ -> state
+      end
+
     {:noreply, assign(socket, state: new_state)}
   end
 
