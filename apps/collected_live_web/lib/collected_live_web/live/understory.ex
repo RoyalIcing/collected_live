@@ -19,6 +19,7 @@ defmodule CollectedLiveWeb.UnderstoryLive do
     [value] jane@example.org
 
     @checkbox Remember me
+    [checked]
 
     @button Sign in
 
