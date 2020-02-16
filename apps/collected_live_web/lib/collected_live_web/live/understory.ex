@@ -24,8 +24,13 @@ defmodule CollectedLiveWeb.UnderstoryLive do
     defstruct source: @default_source,
               preview: :elements
 
+    defp line_endings_to_line_feed(source) when is_binary(source) do
+      source |> String.replace(~r/\r\n/, "\n")
+    end
+
     def change_source(state = %State{}, new_source) when is_binary(new_source) do
-      %State{state | source: new_source}
+      %State{state | source: line_endings_to_line_feed(new_source)}
+    end
 
     def change_preview_to_elements(state = %State{}) do
       %State{state | preview: :elements}
