@@ -47,6 +47,14 @@ defmodule CollectedLiveWeb.UnderstoryLive do
     def change_preview_to_html(state = %State{}) do
       %State{state | preview: :html}
     end
+
+    def change_preview_to_docs(state = %State{}) do
+      %State{state | preview: :docs}
+    end
+
+    def change_preview_to_jest(state = %State{}) do
+      %State{state | preview: :jest}
+    end
   end
 
   defmodule Parser do
@@ -376,6 +384,14 @@ defmodule CollectedLiveWeb.UnderstoryLive do
     content_tag(:pre, html_source, class: "text-sm whitespace-pre-wrap")
   end
 
+  defp present_source(_source, :docs) do
+    content_tag(:div, "Markdown Docs (coming soon)", class: "text-sm")
+  end
+
+  defp present_source(_source, :jest) do
+    content_tag(:div, "Jest Tests (coming soon)", class: "text-sm")
+  end
+
   def render(assigns) do
     # assigns = Map.put(assigns, :cols, col_count)
     # assigns = Map.put(assigns, :rows, max_row + 2)
@@ -386,7 +402,10 @@ defmodule CollectedLiveWeb.UnderstoryLive do
         <div class="flex flex-row flex-grow">
           <%= form_tag "#", phx_change: "text-change", class: "flex-1" %>
             <%= label do %>
-              <%= label_text "Define" %>
+              <div class="mb-2">
+                <%= label_text "Define" %>
+                <%= content_tag(:button, "Make Markdown", class: "text-sm px-1 bg-gray-200 border rounded-sm") %>
+              </div>
               <%= textarea(:define, :source,
                 value: @state.source,
                 phx_hook: "Autofocusing",
@@ -399,7 +418,7 @@ defmodule CollectedLiveWeb.UnderstoryLive do
         <div class="w-1/2">
           <div>
             <%= label_text "Preview" %>
-            <%= form_tag "#", phx_change: "preview-mode-change", class: "inline-block" %>
+            <%= form_tag "#", phx_change: "preview-mode-change", class: "inline-block mb-2" %>
               <%= label(class: "text-sm px-1") do %>
                 <%= radio_button(:preview, :preview_mode, "elements", checked: @state.preview == :elements) %>
                 Interactive
@@ -407,6 +426,14 @@ defmodule CollectedLiveWeb.UnderstoryLive do
               <%= label(class: "text-sm px-1") do %>
                 <%= radio_button(:preview, :preview_mode, "html", checked: @state.preview == :html) %>
                 HTML
+              <% end %>
+              <%= label(class: "text-sm px-1") do %>
+                <%= radio_button(:preview, :preview_mode, "docs", checked: @state.preview == :docs) %>
+                Docs
+              <% end %>
+              <%= label(class: "text-sm px-1") do %>
+                <%= radio_button(:preview, :preview_mode, "jest", checked: @state.preview == :Jest) %>
+                Jest
               <% end %>
             </form>
           </div>
@@ -437,6 +464,8 @@ defmodule CollectedLiveWeb.UnderstoryLive do
       case new_preview_mode do
         "elements" -> State.change_preview_to_elements(state)
         "html" -> State.change_preview_to_html(state)
+        "docs" -> State.change_preview_to_docs(state)
+        "jest" -> State.change_preview_to_jest(state)
         _ -> state
       end
 
