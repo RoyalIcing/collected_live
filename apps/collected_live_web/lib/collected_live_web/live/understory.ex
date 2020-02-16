@@ -401,7 +401,7 @@ defmodule CollectedLiveWeb.UnderstoryLive do
             <%= form_tag "#", phx_change: "preview-mode-change", class: "inline-block" %>
               <%= label(class: "text-sm px-1") do %>
                 <%= radio_button(:preview, :preview_mode, "elements", checked: @state.preview == :elements) %>
-                Elements
+                Interactive
               <% end %>
               <%= label(class: "text-sm px-1") do %>
                 <%= radio_button(:preview, :preview_mode, "html", checked: @state.preview == :html) %>
