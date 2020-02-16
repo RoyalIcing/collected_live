@@ -36,7 +36,7 @@
   @apply text-base font-bold p-2;
 }
 .UnderstoryPreview nav:not([class]) ul {
-  @apply flex flex-row;
+  @apply flex flex-row flex-wrap;
 }
 
 .UnderstoryPreview button:not([class]) {
