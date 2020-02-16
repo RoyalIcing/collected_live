@@ -5,7 +5,7 @@
 </div>
 
 <div>
-  <%= Phoenix.LiveView.live_render(@conn, CollectedLiveWeb.UnderstoryLive, session: %{}) %>
+  <%= live_render(@conn, CollectedLiveWeb.UnderstoryLive, session: %{}) %>
 </div>
 
 <article class="pt-8">

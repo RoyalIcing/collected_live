@@ -5,5 +5,5 @@
 </div>
 
 <div>
-  <%= Phoenix.LiveView.live_render(@conn, CollectedLiveWeb.WeaveLive, session: %{}) %>
+  <%= live_render(@conn, CollectedLiveWeb.WeaveLive, session: %{}) %>
 </div>

@@ -23,7 +23,7 @@ defmodule CollectedLiveWeb do
       import Plug.Conn
       import CollectedLiveWeb.Gettext
       alias CollectedLiveWeb.Router.Helpers, as: Routes
-      import Phoenix.LiveView.Controller, only: [live_render: 3]
+      import Phoenix.LiveView.Helpers
     end
   end
 
@@ -36,19 +36,20 @@ defmodule CollectedLiveWeb do
       # Import convenience functions from controllers
       import Phoenix.Controller, only: [get_flash: 1, get_flash: 2, view_module: 1]
 
+      import Phoenix.LiveView.Helpers
       # Use all HTML functionality (forms, tags, etc)
       use Phoenix.HTML
 
       import CollectedLiveWeb.ErrorHelpers
       import CollectedLiveWeb.Gettext
       alias CollectedLiveWeb.Router.Helpers, as: Routes
-      import Phoenix.LiveView, only: [live_render: 2, live_render: 3]
     end
   end
 
   def live_view do
     quote do
       use Phoenix.LiveView
+      import Phoenix.LiveView.Helpers
       use Phoenix.HTML
     end
   end
