@@ -59,13 +59,7 @@ defmodule CollectedLiveWeb.UnderstoryLive do
         |> parse_options(tail)
       end
 
-      def from_lines(["@heading" | tail]) do
-        %__MODULE__{
-          type: :heading,
-          children: ["Heading"]
-        }
-        |> parse_options(tail)
-      end
+      def from_lines(["@heading" | tail]), do: from_lines(["@heading ?" | tail])
 
       def from_lines(["@link " <> text | tail]) do
         %__MODULE__{
@@ -76,14 +70,7 @@ defmodule CollectedLiveWeb.UnderstoryLive do
         |> parse_options(tail)
       end
 
-      def from_lines(["@link" | tail]) do
-        %__MODULE__{
-          type: :link,
-          children: ["Link"],
-          attributes: [href: "#"]
-        }
-        |> parse_options(tail)
-      end
+      def from_lines(["@link" | tail]), do: from_lines(["@link ?" | tail])
 
       def from_lines(["@textbox " <> rest | tail]) do
         %__MODULE__{
@@ -93,12 +80,7 @@ defmodule CollectedLiveWeb.UnderstoryLive do
         |> parse_options(tail)
       end
 
-      def from_lines(["@textbox" | tail]) do
-        %__MODULE__{
-          type: :textbox
-        }
-        |> parse_options(tail)
-      end
+      def from_lines(["@textbox" | tail]), do: from_lines(["@textbox " | tail])
 
       def from_lines(["@checkbox " <> rest | tail]) do
         %__MODULE__{
@@ -108,12 +90,7 @@ defmodule CollectedLiveWeb.UnderstoryLive do
         |> parse_options(tail)
       end
 
-      def from_lines(["@checkbox" | tail]) do
-        %__MODULE__{
-          type: :checkbox
-        }
-        |> parse_options(tail)
-      end
+      def from_lines(["@checkbox" | tail]), do: from_lines(["@checkbox " | tail])
 
       def from_lines(["@button " <> title | tail]) do
         %__MODULE__{
@@ -123,13 +100,7 @@ defmodule CollectedLiveWeb.UnderstoryLive do
         |> parse_options(tail)
       end
 
-      def from_lines(["@button" | tail]) do
-        %__MODULE__{
-          type: :button,
-          children: ["Button"]
-        }
-        |> parse_options(tail)
-      end
+      def from_lines(["@button" | tail]), do: from_lines(["@button ?" | tail])
 
       def from_lines(["@navigation " <> label | tail]) do
         %__MODULE__{
@@ -139,12 +110,7 @@ defmodule CollectedLiveWeb.UnderstoryLive do
         |> parse_options(tail)
       end
 
-      def from_lines(["@navigation" | tail]) do
-        %__MODULE__{
-          type: :navigation
-        }
-        |> parse_options(tail)
-      end
+      def from_lines(["@navigation" | tail]), do: from_lines(["@navigation " | tail])
 
       def from_lines(["@" <> unknown_role]) do
         %__MODULE__{
