@@ -7,10 +7,10 @@ defmodule CollectedLiveWeb.UnderstoryLive do
   defmodule State do
     @default_source """
     @navigation Primary
-    - Features
-    - Pricing
-    - Sign in
-    - Join
+    - @link Features
+    - @link Pricing
+    - @link Sign in
+    - @link Join
 
     @textbox jane@example.org
     .block w-full px-1
@@ -43,7 +43,30 @@ defmodule CollectedLiveWeb.UnderstoryLive do
 
   defmodule Parser do
     defmodule Block do
-      defstruct type: :unknown, children: [], class: "", attributes: [], errors: []
+      defstruct type: :unknown,
+                children: [],
+                list_items: [],
+                class: "",
+                attributes: [],
+                errors: []
+
+      def from_lines(["@link " <> text | tail]) do
+        %__MODULE__{
+          type: :link,
+          children: [text],
+          attributes: [href: "#"]
+        }
+        |> parse_options(tail)
+      end
+
+      def from_lines(["@link" | tail]) do
+        %__MODULE__{
+          type: :link,
+          children: ["Link"],
+          attributes: [href: "#"]
+        }
+        |> parse_options(tail)
+      end
 
       def from_lines(["@textbox " <> rest | tail]) do
         %__MODULE__{
@@ -125,8 +148,9 @@ defmodule CollectedLiveWeb.UnderstoryLive do
         %__MODULE__{block | class: "#{class} #{class_name}"}
       end
 
-      defp add_item(block = %__MODULE__{children: children}, item) do
-        %__MODULE__{block | children: children ++ [item]}
+      defp add_list_item(block = %__MODULE__{list_items: list_items}, raw_item) do
+        parsed_item = from_lines([raw_item])
+        %__MODULE__{block | list_items: list_items ++ [parsed_item]}
       end
 
       defp parse_options(block, lines) do
@@ -135,7 +159,7 @@ defmodule CollectedLiveWeb.UnderstoryLive do
             add_class_name(block, class_name)
 
           "-" <> content, block ->
-            add_item(block, content)
+            add_list_item(block, content |> String.trim_leading())
 
           _item, block ->
             block
@@ -172,6 +196,15 @@ defmodule CollectedLiveWeb.UnderstoryLive do
     defp always_space(items), do: items
 
     defp present_block(%Block{
+           type: :link,
+           children: children,
+           class: class,
+           attributes: attributes
+         }) do
+      content_tag(:a, always_space(children), attributes ++ [class: class])
+    end
+
+    defp present_block(%Block{
            type: :text,
            children: children,
            class: class,
@@ -190,14 +223,18 @@ defmodule CollectedLiveWeb.UnderstoryLive do
 
     defp present_block(%Block{
            type: :navigation,
-           children: children,
+           list_items: list_items,
            attributes: attributes,
            class: class
          }) do
-      list_items = children |> Enum.map(&content_tag(:li, &1))
+      presented_list_items =
+        list_items
+        |> Enum.map(fn item ->
+          content_tag(:li, item |> present_block())
+        end)
 
       content_tag(:nav, attributes ++ [class: class]) do
-        content_tag(:ul, list_items)
+        content_tag(:ul, presented_list_items)
       end
     end
 
@@ -263,7 +300,7 @@ defmodule CollectedLiveWeb.UnderstoryLive do
               <% end %>
             </form>
           </div>
-          <div class="bg-gray-200 border border-l-0 p-4">
+          <div class="bg-gray-200 border border-l-0 p-4 var:underline-hovered-links">
             <%= @state.source |> present_source(@state.preview) %>
           </div>
         </div>
