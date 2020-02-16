@@ -1,5 +1,5 @@
-<div class="max-w-3xl mx-auto">
-  <header class="py-4">
+<div class="px-3">
+  <header class="max-w-3xl mx-auto py-4">
     <h1 class="text-4xl"><%= gettext "%{name}", name: "Understory: Accessibility-First Design" %></h1>
   </header>
 </div>
@@ -8,9 +8,20 @@
   <%= live_render(@conn, CollectedLiveWeb.UnderstoryLive, session: %{}) %>
 </div>
 
-<article class="pt-8">
-  <ul class="text-center">
-    <li><%= link("MDN · Using ARIA: Roles, states, and properties", to: "https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/ARIA_Techniques") %>
-    <li><%= link("ARIA roles to elements", to: "https://github.com/A11yance/aria-query#elements-to-roles") %>
-  </ul>
-</article>
+<section class="px-3 pb-12 leading-7 tracking-wide">
+  <article class="max-w-3xl mx-auto pt-8">
+    <h2 class="mb-3 font-bold">About Understory</h2>
+    <p>Understory lets you think of accessibility first, with a friendly subset of Markdown.
+    <p>Place <strong>landmarks</strong> and <strong>widgets</strong>, and preview them live.
+    Bootstrap accessibility-first tests for Jest.
+    And, export to Markdown documentation.
+  </article>
+
+  <article class="max-w-3xl mx-auto pt-8">
+    <h2 class="font-bold">Useful Links</h2>
+    <ul class="lg:list-disc">
+      <li><%= link("MDN · Using ARIA: Roles, states, and properties", to: "https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/ARIA_Techniques") %>
+      <li><%= link("ARIA roles to elements", to: "https://github.com/A11yance/aria-query#elements-to-roles") %>
+    </ul>
+  </article>
+</section>

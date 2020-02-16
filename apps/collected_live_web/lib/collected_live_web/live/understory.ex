@@ -402,9 +402,9 @@ defmodule CollectedLiveWeb.UnderstoryLive do
         <div class="flex flex-row flex-grow">
           <%= form_tag "#", phx_change: "text-change", class: "flex-1" %>
             <%= label do %>
-              <div class="mb-2">
+              <div class="mb-4">
                 <%= label_text "Define" %>
-                <%= content_tag(:button, "Make Markdown", class: "text-sm px-1 bg-gray-200 border rounded-sm") %>
+                <%= content_tag(:button, "Make Markdown", class: "text-sm mx-1 px-1 bg-yellow-300 border border-yellow-400 rounded") %>
               </div>
               <%= textarea(:define, :source,
                 value: @state.source,
@@ -418,22 +418,18 @@ defmodule CollectedLiveWeb.UnderstoryLive do
         <div class="w-1/2">
           <div>
             <%= label_text "Preview" %>
-            <%= form_tag "#", phx_change: "preview-mode-change", class: "inline-block mb-2" %>
+            <%= form_tag "#", phx_change: "preview-mode-change", class: "inline-block mb-4" %>
               <%= label(class: "text-sm px-1") do %>
-                <%= radio_button(:preview, :preview_mode, "elements", checked: @state.preview == :elements) %>
-                Interactive
+                <%= radio_button(:preview, :preview_mode, "elements", checked: @state.preview == :elements, class: "mr-1") %>Interactive
               <% end %>
               <%= label(class: "text-sm px-1") do %>
-                <%= radio_button(:preview, :preview_mode, "html", checked: @state.preview == :html) %>
-                HTML
+                <%= radio_button(:preview, :preview_mode, "html", checked: @state.preview == :html, class: "mr-1") %>HTML
               <% end %>
               <%= label(class: "text-sm px-1") do %>
-                <%= radio_button(:preview, :preview_mode, "docs", checked: @state.preview == :docs) %>
-                Docs
+                <%= radio_button(:preview, :preview_mode, "docs", checked: @state.preview == :docs, class: "mr-1") %>Docs
               <% end %>
               <%= label(class: "text-sm px-1") do %>
-                <%= radio_button(:preview, :preview_mode, "jest", checked: @state.preview == :Jest) %>
-                Jest
+                <%= radio_button(:preview, :preview_mode, "jest", checked: @state.preview == :jest, class: "mr-1") %>Jest
               <% end %>
             </form>
           </div>
