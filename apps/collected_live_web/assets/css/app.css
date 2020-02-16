@@ -6,6 +6,17 @@
 @tailwind components;
 @tailwind utilities;
 
+a:hover {
+  text-decoration: var(--hover-text-decoration);
+}
+
+article {
+  --hover-text-decoration: underline;
+}
+
+.var\:underline-links {
+  --hover-text-decoration: underline;
+}
 
 /* @import "tailwindcss/base";
 @import "tailwindcss/components";

@@ -7,3 +7,10 @@
 <div>
   <%= Phoenix.LiveView.live_render(@conn, CollectedLiveWeb.UnderstoryLive, session: %{}) %>
 </div>
+
+<article class="pt-8">
+  <ul class="text-center">
+    <li><%= link("MDN · Using ARIA: Roles, states, and properties", to: "https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/ARIA_Techniques") %>
+    <li><%= link("ARIA roles to elements", to: "https://github.com/A11yance/aria-query#elements-to-roles") %>
+  </ul>
+</article>
