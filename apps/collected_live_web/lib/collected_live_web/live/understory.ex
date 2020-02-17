@@ -391,7 +391,12 @@ defmodule CollectedLiveWeb.UnderstoryLive do
             try do
               {:ok, syntax_highlight(code)}
             catch
-              _, _ ->
+              error ->
+                IO.puts(error, label: "syntect_error 1")
+                :error
+
+              error, _ ->
+                IO.puts(error, label: "syntect_error 2")
                 :error
             end
           end)
@@ -418,10 +423,8 @@ defmodule CollectedLiveWeb.UnderstoryLive do
 
       defp get_syntect_server_url do
         CollectedLiveWeb.Endpoint.config(:royal_icing)
-        |> IO.inspect(label: "royal icing config")
         |> Keyword.fetch!(:syntax_highlighter)
         |> Keyword.fetch!(:url)
-        |> IO.inspect(label: "syntax_highlighter url")
       end
 
       defp syntax_highlight(code) do
