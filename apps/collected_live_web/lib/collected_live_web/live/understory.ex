@@ -120,7 +120,7 @@ defmodule CollectedLiveWeb.UnderstoryLive do
       def from_lines(["@navigation " <> label | tail]) do
         %__MODULE__{
           type: :navigation,
-          attributes: ["aria-label": label]
+          attributes: [{"aria-label", label}]
         }
         |> parse_options(tail)
       end
@@ -365,10 +365,12 @@ defmodule CollectedLiveWeb.UnderstoryLive do
     alias Parser.Block
 
     def present(blocks) do
-      test_source = blocks
+      test_source =
+        blocks
         |> Enum.map(&present_block/1)
         |> Enum.join("\n\n")
         |> String.replace("\t", "  ")
+
       content_tag(:pre, test_source, class: "text-xs whitespace-pre-wrap")
     end
 
@@ -378,7 +380,8 @@ defmodule CollectedLiveWeb.UnderstoryLive do
            attributes: attributes,
            class: class
          }) do
-          text = children |> Enum.join("")
+      text = children |> Enum.join("")
+
       [
         "it ('has \"#{text}\" heading', () => {",
         "\tconst { getAllByRole, getByText } = subject();",
@@ -396,10 +399,11 @@ defmodule CollectedLiveWeb.UnderstoryLive do
            attributes: attributes,
            class: class
          }) do
-          text = children |> Enum.join("")
+      text = children |> Enum.join("")
+
       [
         "it ('has \"#{text}\" textbox', () => {",
-        "\tconst { getAllByRole, getByText } = subject();",
+        "\tconst { getAllByRole, getByLabelText } = subject();",
         "\texpect(getAllByRole('textbox')).toContain(",
         "\t\tgetByLabelText('#{text}')",
         "\t);",
@@ -414,10 +418,11 @@ defmodule CollectedLiveWeb.UnderstoryLive do
            attributes: attributes,
            class: class
          }) do
-          text = children |> Enum.join("")
+      text = children |> Enum.join("")
+
       [
         "it ('has \"#{text}\" checkbox', () => {",
-        "\tconst { getAllByRole, getByText } = subject();",
+        "\tconst { getAllByRole, getByLabelText } = subject();",
         "\texpect(getAllByRole('checkbox')).toContain(",
         "\t\tgetByLabelText('#{text}')",
         "\t);",
@@ -432,17 +437,46 @@ defmodule CollectedLiveWeb.UnderstoryLive do
            attributes: attributes,
            class: class
          }) do
-          text = children |> Enum.join("")
+      text = children |> Enum.join("")
+
       [
         "it ('has \"#{text}\" button', () => {",
         "\tconst { getAllByRole, getByText } = subject();",
         "\texpect(getAllByRole('button')).toContain(",
-        "\t\tgetByLabelText('#{text}')",
+        "\t\getByText('#{text}')",
         "\t);",
         "});"
       ]
       |> Enum.join("\n")
     end
+
+    defp present_block(%Block{
+           type: :navigation,
+           children: children,
+           attributes: attributes,
+           class: class
+         }) do
+          IO.inspect(attributes, label: "ATTRS")
+      ariaLabel =
+        Enum.find_value(attributes, fn
+          {"aria-label", value} -> value
+          _ -> nil
+        end)
+
+      [
+        "describe ('#{ariaLabel} navigation', () => {",
+        "\tit ('is present', () => {",
+        "\t\tconst { getAllByRole } = subject();",
+        "\t\texpect(getAllByRole('navigation').map(el => el.getAttribute('aria-label')))",
+        "\t\t.toContain('#{ariaLabel}')",
+        "\t\t);",
+        "\t});",
+        "});"
+      ]
+      |> Enum.join("\n")
+    end
+
+    defp present_block(%Block{type: :text}), do: ""
 
     defp present_block(%Block{type: type, errors: []}) do
       "// Unknown block type: #{type}"
