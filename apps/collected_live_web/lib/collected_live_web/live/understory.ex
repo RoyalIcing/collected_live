@@ -384,12 +384,28 @@ defmodule CollectedLiveWeb.UnderstoryLive do
     content_tag(:pre, html_source, class: "text-sm whitespace-pre-wrap")
   end
 
-  defp present_source(source, :docs) do
-    {:ok, html, _} = Earmark.as_html(source)
+  defp source_to_markdown(source) do
+    source
+    |> String.split("\n")
+    |> Enum.map(fn line ->
+      line
+      |> String.replace(~r/^([-]\s)?(@\w+)/, "\\1`\\2`")
+      |> String.replace(~r/^(\[\w+\])/, "`\\1`")
+      |> String.replace(~r/$/, "  ")
+    end)
+    |> Enum.join("\n")
+  end
 
-    content_tag(:div, [
-      raw(html)
-    ], class: "UnderstoryPreviewDocs text-sm")
+  defp present_source(source, :docs) do
+    {:ok, html, _} = source |> source_to_markdown() |> Earmark.as_html()
+
+    content_tag(
+      :div,
+      [
+        raw(html)
+      ],
+      class: "UnderstoryPreviewDocs text-sm"
+    )
   end
 
   defp present_source(_source, :jest) do

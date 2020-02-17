@@ -59,9 +59,18 @@
   @apply mr-2;
 }
 
+.UnderstoryPreviewDocs {
+  @apply text-base;
+}
 .UnderstoryPreviewDocs p {
   @apply mb-4;
 }
 .UnderstoryPreviewDocs ul {
   @apply mb-4 pl-4 list-disc;
+}
+.UnderstoryPreviewDocs p + ul {
+  margin-top: -1rem;
+}
+.UnderstoryPreviewDocs code.inline {
+  @apply text-purple-700;
 }
