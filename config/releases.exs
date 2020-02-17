@@ -12,9 +12,6 @@ secret_key_base =
     You can generate one by calling: mix phx.gen.secret
     """
 
-# TODO: remove this from logging secret key
-IO.puts("SECRET KEY BASE #{secret_key_base}")
-
 host =
   System.get_env("SERVICE_HOSTNAME") || System.get_env("RENDER_EXTERNAL_HOSTNAME") ||
     System.get_env("APP_NAME") <> ".gigalixirapp.com"
