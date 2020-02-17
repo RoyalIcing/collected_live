@@ -9,7 +9,7 @@
     <%= csrf_meta_tag() %>
   </head>
   <body>
-    <header class="bg-gray-900 text-white">
+    <header class="bg-gray-900 text-white @link:hover:underline">
       <section class="px-2 flex flex-row justify-between">
         <a class="block px-3 py-2 font-bold" href="/">Collected.Live</a>
         <%= render "_primary_nav.html", assigns %>
