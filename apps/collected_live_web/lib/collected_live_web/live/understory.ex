@@ -406,7 +406,7 @@ defmodule CollectedLiveWeb.UnderstoryLive do
             {:ok, result} ->
               result
 
-            :err ->
+            :error ->
               Logger.error("Failed to highlight")
               nil
 
