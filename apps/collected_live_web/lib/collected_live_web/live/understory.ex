@@ -361,6 +361,98 @@ defmodule CollectedLiveWeb.UnderstoryLive do
     end
   end
 
+  defmodule JestGenerator do
+    alias Parser.Block
+
+    def present(blocks) do
+      test_source = blocks
+        |> Enum.map(&present_block/1)
+        |> Enum.join("\n\n")
+        |> String.replace("\t", "  ")
+      content_tag(:pre, test_source, class: "text-xs whitespace-pre-wrap")
+    end
+
+    defp present_block(%Block{
+           type: :heading,
+           children: children,
+           attributes: attributes,
+           class: class
+         }) do
+          text = children |> Enum.join("")
+      [
+        "it ('has \"#{text}\" heading', () => {",
+        "\tconst { getAllByRole, getByText } = subject();",
+        "\texpect(getAllByRole('heading')).toContain(",
+        "\t\tgetByText('#{text}')",
+        "\t);",
+        "});"
+      ]
+      |> Enum.join("\n")
+    end
+
+    defp present_block(%Block{
+           type: :textbox,
+           children: children,
+           attributes: attributes,
+           class: class
+         }) do
+          text = children |> Enum.join("")
+      [
+        "it ('has \"#{text}\" textbox', () => {",
+        "\tconst { getAllByRole, getByText } = subject();",
+        "\texpect(getAllByRole('textbox')).toContain(",
+        "\t\tgetByLabelText('#{text}')",
+        "\t);",
+        "});"
+      ]
+      |> Enum.join("\n")
+    end
+
+    defp present_block(%Block{
+           type: :checkbox,
+           children: children,
+           attributes: attributes,
+           class: class
+         }) do
+          text = children |> Enum.join("")
+      [
+        "it ('has \"#{text}\" checkbox', () => {",
+        "\tconst { getAllByRole, getByText } = subject();",
+        "\texpect(getAllByRole('checkbox')).toContain(",
+        "\t\tgetByLabelText('#{text}')",
+        "\t);",
+        "});"
+      ]
+      |> Enum.join("\n")
+    end
+
+    defp present_block(%Block{
+           type: :button,
+           children: children,
+           attributes: attributes,
+           class: class
+         }) do
+          text = children |> Enum.join("")
+      [
+        "it ('has \"#{text}\" button', () => {",
+        "\tconst { getAllByRole, getByText } = subject();",
+        "\texpect(getAllByRole('button')).toContain(",
+        "\t\tgetByLabelText('#{text}')",
+        "\t);",
+        "});"
+      ]
+      |> Enum.join("\n")
+    end
+
+    defp present_block(%Block{type: type, errors: []}) do
+      "// Unknown block type: #{type}"
+    end
+
+    defp present_block(%Block{errors: errors}) do
+      "// Errors: #{errors}"
+    end
+  end
+
   def mount(%{}, socket) do
     {:ok, assign(socket, state: %State{})}
   end
@@ -404,12 +496,20 @@ defmodule CollectedLiveWeb.UnderstoryLive do
       [
         raw(html)
       ],
-      class: "UnderstoryPreviewDocs text-sm"
+      class: "UnderstoryPreviewDocs"
     )
   end
 
-  defp present_source(_source, :jest) do
-    content_tag(:div, "Jest Tests (coming soon)", class: "text-sm")
+  defp present_source(source, :jest) do
+    blocks = source |> Parser.parse_string()
+
+    content_tag(
+      :div,
+      [
+        JestGenerator.present(blocks)
+      ],
+      class: "text-sm"
+    )
   end
 
   def render(assigns) do
