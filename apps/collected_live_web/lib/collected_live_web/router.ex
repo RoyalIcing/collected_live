@@ -34,6 +34,8 @@ defmodule CollectedLiveWeb.Router do
 
     get "/weave", WeaveController, :index
 
+    get "/tempo", TempoController, :index
+
     live "/search/code", ZipLive
     live "/search/code/github/:owner/:repo/:release", ZipLive
 

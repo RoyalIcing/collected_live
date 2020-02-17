@@ -1,0 +1,11 @@
+<div class="px-3">
+  <header class="max-w-3xl mx-auto pt-4 pb-6 text-center">
+    <h1 class="text-3xl">
+      <strong>Tempo:</strong> Latency of various services
+    </h1>
+  </header>
+</div>
+
+<div>
+  <%= live_render(@conn, CollectedLiveWeb.TempoLive, session: %{}) %>
+</div>
