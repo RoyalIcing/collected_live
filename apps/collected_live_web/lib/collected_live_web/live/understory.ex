@@ -430,7 +430,7 @@ defmodule CollectedLiveWeb.UnderstoryLive do
                 value: @state.source,
                 phx_hook: "Autofocusing",
                 rows: 30,
-                class: "block w-full px-3 py-2 font-mono text-base border")
+                class: "block w-full px-3 py-2 font-sans text-base border")
               %>
             <% end %>
           </form>
