@@ -362,7 +362,9 @@ defmodule CollectedLiveWeb.UnderstoryLive do
   end
 
   defmodule JestGenerator do
+    use Phoenix.HTML
     alias Parser.Block
+    alias CollectedLive.HTTPClient
 
     def present(blocks) do
       test_source =
@@ -371,7 +373,80 @@ defmodule CollectedLiveWeb.UnderstoryLive do
         |> Enum.join("\n\n")
         |> String.replace("\t", "  ")
 
-      content_tag(:pre, test_source, class: "text-xs whitespace-pre-wrap")
+      test_source_html = test_source |> syntax_highlight() |> raw()
+
+      content_tag(:div, test_source_html,
+        class: "text-xs overflow-scroll",
+        style: "background-color: #151d28; margin: -1rem; padding: 1rem;"
+      )
+    end
+
+    defmodule SyntaxHighlight do
+      @theme "Sourcegraph"
+      @timeout 3000
+
+      def to_html(code) do
+        task =
+          Task.async(fn ->
+            try do
+              {:ok, syntax_highlight(code)}
+            catch
+              _, _ ->
+                :error
+            end
+          end)
+
+        result =
+          case Task.yield(task, @timeout) || Task.shutdown(task) do
+            {:ok, result} ->
+              result
+
+            :err ->
+              Logger.error("Failed to highlight")
+              nil
+
+            nil ->
+              Logger.warn("Failed to highlight in #{@timeout}ms")
+              nil
+          end
+
+        case result do
+          {:ok, result} -> result
+          _ -> nil
+        end
+      end
+
+      defp get_syntect_server_url do
+        CollectedLiveWeb.Endpoint.config(:royal_icing)
+        |> IO.inspect(label: "royal icing config")
+        |> Keyword.fetch!(:syntax_highlighter)
+        |> Keyword.fetch!(:url)
+        |> IO.inspect(label: "syntax_highlighter url")
+      end
+
+      defp syntax_highlight(code) do
+        request_body =
+          Jason.encode!(%{
+            "filepath" => "test.js",
+            "theme" => @theme,
+            "code" => code
+          })
+
+        {:ok, response} =
+          HTTPClient.post(get_syntect_server_url(), request_body,
+            headers: [{"content-type", "application/json"}]
+          )
+
+        json_response = Jason.decode!(response.body)
+        Map.fetch!(json_response, "data")
+      end
+    end
+
+    defp syntax_highlight(code) do
+      case SyntaxHighlight.to_html(code) do
+        nil -> content_tag(:pre, code, class: "text-white")
+        html -> raw(html)
+      end
     end
 
     defp present_block(%Block{
@@ -456,7 +531,6 @@ defmodule CollectedLiveWeb.UnderstoryLive do
            attributes: attributes,
            class: class
          }) do
-          IO.inspect(attributes, label: "ATTRS")
       ariaLabel =
         Enum.find_value(attributes, fn
           {"aria-label", value} -> value

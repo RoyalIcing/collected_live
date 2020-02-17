@@ -59,6 +59,15 @@ config :collected_live_web, CollectedLiveWeb.Endpoint,
     ]
   ]
 
+config :collected_live_web, CollectedLiveWeb.Endpoint,
+  royal_icing: [
+    # Run syntect_server via:
+    # `docker run --detach --name=syntect_server -p 9238:9238 sourcegraph/syntect_server`
+    syntax_highlighter: [
+      url: "http://0.0.0.0:9238/"
+    ]
+  ]
+
 # Do not include metadata nor timestamps in development logs
 config :logger, :console, format: "[$level] $message\n"
 
