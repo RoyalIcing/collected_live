@@ -51,7 +51,8 @@ defmodule CollectedLiveWeb.MixProject do
       {:ueberauth, "~> 0.6"},
       {:oauth2, "~> 2.0", override: true},
       {:ueberauth_github, "~> 0.7"},
-      { :inflex, "~> 2.0.0" }
+      {:inflex, "~> 2.0.0"},
+      {:earmark, "~> 1.4"}
     ]
   end
 

@@ -58,3 +58,10 @@
 .UnderstoryPreview [role="radiogroup"]:not([class]) input[type="radio"] {
   @apply mr-2;
 }
+
+.UnderstoryPreviewDocs p {
+  @apply mb-4;
+}
+.UnderstoryPreviewDocs ul {
+  @apply mb-4 pl-4 list-disc;
+}

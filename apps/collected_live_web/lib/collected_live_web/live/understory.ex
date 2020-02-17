@@ -384,8 +384,12 @@ defmodule CollectedLiveWeb.UnderstoryLive do
     content_tag(:pre, html_source, class: "text-sm whitespace-pre-wrap")
   end
 
-  defp present_source(_source, :docs) do
-    content_tag(:div, "Markdown Docs (coming soon)", class: "text-sm")
+  defp present_source(source, :docs) do
+    {:ok, html, _} = Earmark.as_html(source)
+
+    content_tag(:div, [
+      raw(html)
+    ], class: "UnderstoryPreviewDocs text-sm")
   end
 
   defp present_source(_source, :jest) do
