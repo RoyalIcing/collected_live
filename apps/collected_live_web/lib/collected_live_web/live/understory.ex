@@ -392,11 +392,11 @@ defmodule CollectedLiveWeb.UnderstoryLive do
               {:ok, syntax_highlight(code)}
             catch
               error ->
-                IO.puts(error, label: "syntect_error 1")
+                IO.inspect(error, label: "syntect_error 1")
                 :error
 
-              error, _ ->
-                IO.puts(error, label: "syntect_error 2")
+              error, arg ->
+                IO.inspect({error, arg}, label: "syntect_error 2")
                 :error
             end
           end)
@@ -419,6 +419,10 @@ defmodule CollectedLiveWeb.UnderstoryLive do
           {:ok, result} -> result
           _ -> nil
         end
+      end
+
+      defp get_syntect_server_url do
+        "http://0.0.0.0:9237/"
       end
 
       defp get_syntect_server_url do
