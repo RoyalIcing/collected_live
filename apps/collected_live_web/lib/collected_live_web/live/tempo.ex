@@ -144,34 +144,4 @@ defmodule CollectedLiveWeb.TempoLive do
     </div>
     """
   end
-
-  def handle_event(
-        "text-change",
-        %{"define" => %{"source" => new_source}},
-        socket = %Socket{assigns: %{state: state}}
-      ) do
-    new_state = State.change_source(state, new_source)
-    {:noreply, assign(socket, state: new_state)}
-  end
-
-  def handle_event(
-        "preview-mode-change",
-        %{"preview" => %{"preview_mode" => new_preview_mode}},
-        socket = %Socket{assigns: %{state: state}}
-      ) do
-    new_state =
-      case new_preview_mode do
-        "elements" -> State.change_preview_to_elements(state)
-        "html" -> State.change_preview_to_html(state)
-        "docs" -> State.change_preview_to_docs(state)
-        "jest" -> State.change_preview_to_jest(state)
-        _ -> state
-      end
-
-    {:noreply, assign(socket, state: new_state)}
-  end
-
-  defp label_text(text) do
-    content_tag(:span, text, class: "text-xs font-bold text-gray-500 uppercase tracking-wide")
-  end
 end
