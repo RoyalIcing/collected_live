@@ -33,10 +33,7 @@ defmodule CollectedLiveWeb.TempoLive do
   defp measure_request_to(url) do
     start_ms = System.system_time(:millisecond)
 
-    {:ok, response} =
-      HTTPClient.get(
-        "https://collected.systems/1/github/gilbarbara/logos/93e29467eea30b2981187822143f45e562662b5c/logos/atlassian.svg"
-      )
+    {:ok, _response} = HTTPClient.get(url)
 
     end_ms = System.system_time(:millisecond)
     ms = end_ms - start_ms
