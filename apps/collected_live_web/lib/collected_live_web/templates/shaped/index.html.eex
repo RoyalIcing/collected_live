@@ -1,0 +1,11 @@
+<div class="px-3">
+  <header class="max-w-3xl mx-auto pt-4 pb-6 text-center">
+    <h1 class="text-3xl">
+      <strong>Shaped:</strong> Create SVG Icons in minutes
+    </h1>
+  </header>
+</div>
+
+<div>
+  <%= live_render(@conn, CollectedLiveWeb.ShapedLive, session: %{}) %>
+</div>

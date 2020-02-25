@@ -30,6 +30,8 @@ defmodule CollectedLiveWeb.Router do
 
     get "/understory", UnderstoryController, :index
 
+    get "/shaped", ShapedController, :index
+
     get "/svg", SVGController, :index
 
     get "/weave", WeaveController, :index
