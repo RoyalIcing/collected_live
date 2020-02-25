@@ -12,7 +12,19 @@ defmodule CollectedLiveWeb.ShapedLive do
   end
 
   defmodule State do
-    defstruct size: 24, base_color: "black", cells: %{}
+    defstruct size: 24, base_color: "#372849", primitives: [], cells: %{}
+
+    def make_plus_circle_24() do
+      primitives = [
+        {:circle, 9, {12, 12}, %{stroke: %{width: 2}}},
+        {:plus, 3, {12, 12}, %{stroke: %{width: 2}}}
+      ]
+
+      %State{
+        size: 24,
+        primitives: primitives
+      }
+    end
 
     def make_arrow_24() do
       vertical_stem =
@@ -69,16 +81,17 @@ defmodule CollectedLiveWeb.ShapedLive do
   end
 
   def mount(%{}, socket) do
-    state = State.make_arrow_24()
+    state1 = State.make_plus_circle_24()
+    state2 = State.make_arrow_24()
 
-    {:ok, assign(socket, state: state)}
+    {:ok, assign(socket, state1: state1, state2: state2)}
   end
 
-  defp render_x_y(state = %State{}, x, y) do
-    state |> State.at_x_y(x, y) |> render_x_y(state, x, y)
+  defp render_cell(state = %State{}, x, y) do
+    state |> State.at_x_y(x, y) |> render_cell(state, x, y)
   end
 
-  defp render_x_y(:whole, state = %State{}, x, y) do
+  defp render_cell(:whole, state = %State{}, x, y) do
     content_tag(:rect, "",
       x: x - 1,
       y: y - 1,
@@ -193,16 +206,16 @@ defmodule CollectedLiveWeb.ShapedLive do
     end
   end
 
-  defp render_x_y({:diagonal, direction}, state = %State{}, x, y),
-    do: render_x_y({:diagonal, direction, []}, state, x, y)
+  defp render_cell({:diagonal, direction}, state = %State{}, x, y),
+    do: render_cell({:diagonal, direction, []}, state, x, y)
 
-  defp render_x_y({:diagonal, _direction, _options} = tuple, state = %State{}, x, y) do
+  defp render_cell({:diagonal, _direction, _options} = tuple, state = %State{}, x, y) do
     tuple
     |> Diagonal.from_tuple()
     |> Diagonal.to_svg_element(x, y, state.base_color)
   end
 
-  defp render_x_y(_, _state = %State{}, x, y) do
+  defp render_cell(_, _state = %State{}, x, y) do
     content_tag(:rect, "",
       x: x - 1,
       y: y - 1,
@@ -210,6 +223,57 @@ defmodule CollectedLiveWeb.ShapedLive do
       height: 1,
       fill: "transparent"
     )
+  end
+
+  defmodule Primitive do
+    defp options_to_svg_attributes(options, color) do
+      Enum.reduce(
+        options,
+        [
+          fill: "none"
+        ],
+        fn
+          {:stroke, %{width: width}}, attrs ->
+            attrs ++
+              [
+                stroke: color,
+                stroke_width: width,
+                stroke_linecap: "round",
+                stroke_linejoin: "round"
+              ]
+
+          {:fill, _}, attrs ->
+            attrs ++ [fill: color]
+
+          _, attrs ->
+            attrs
+        end
+      )
+      |> Keyword.new()
+    end
+
+    def render({:circle, r, {cx, cy}, options}, color) do
+      attrs = [r: r, cx: cx, cy: cy] ++ options_to_svg_attributes(options, color)
+      content_tag(:circle, "", attrs)
+    end
+
+    def render({:plus, r, {cx, cy}, options}, color) do
+      d = """
+      M#{cx - r},#{cy} h#{r * 2}
+      M#{cx},#{cy-r} v#{r * 2}
+      """
+
+      attrs = [d: d] ++ options_to_svg_attributes(options, color)
+      content_tag(:path, "", attrs)
+    end
+
+    def render(_, _color) do
+      raw(nil)
+    end
+  end
+
+  defp render_primitive(primitive, state = %State{}) do
+    primitive |> Primitive.render(state.base_color)
   end
 
   defp heroicons_preview("solid-sm" = group, name) do
@@ -251,7 +315,7 @@ defmodule CollectedLiveWeb.ShapedLive do
     assigns = %{}
 
     ~L"""
-    <div class="relative mb-4">
+    <div class="relative">
       <img
         src="<%= heroicons_svg_url(group, name) %>"
         alt=""
@@ -282,49 +346,67 @@ defmodule CollectedLiveWeb.ShapedLive do
     """
   end
 
-  def render(assigns) do
-    max_x = assigns.state.size + 1
-    max_y = assigns.state.size + 1
+  def render_cells(unique_id, cells, state) do
+    assigns = %{}
+    max_x = state.size + 1
+    max_y = state.size + 1
 
     ~L"""
+    <svg
+      height="800" viewBox="0 0 <%= state.size + 100 %> <%= state.size %>"
+      xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+    >
+      <g id="<%= unique_id %>-grid">
+        <%= for x <- 1..max_x do %>
+          <%= for y <- 1..max_y do %>
+            <rect
+              x="<%= x - 1 %>"
+              y="<%= y - 1 %>"
+              width="1"
+              height="1"
+              fill="transparent"
+              stroke="#ddd"
+              stroke-width="0.05"
+            />
+          <% end %>
+        <% end %>
+      </g>
+
+      <g id="main">
+        <%= for x <- 1..max_x do %>
+          <%= for y <- 1..max_y do %>
+            <%= render_cell(state, x, y) %>
+          <% end %>
+        <% end %>
+
+        <%= for primitive <- state.primitives do %>
+          <%= render_primitive(primitive, state) %>
+        <% end %>
+      </g>
+
+      <use xlink:href="#<%= unique_id %>-main" transform="translate(<%= state.size + 1 %> 0) scale(0.25 0.25)" />
+    </svg>
+    """
+  end
+
+  def render(assigns) do
+    ~L"""
     <div class="max-w-4xl mx-auto text-center">
-      <%= heroicons_preview("solid-sm", "sm-arrow-down") %>
-      <%= heroicons_preview("solid-sm", "sm-check") %>
-      <%= heroicons_preview("solid-sm", "sm-plus-circle") %>
-      <%= heroicons_preview("outline-md", "md-arrow-down") %>
-      <%= heroicons_preview("outline-md", "md-check") %>
-      <%= heroicons_preview("outline-md", "md-plus-circle") %>
+      <div class="mb-4">
+        <%= heroicons_preview("solid-sm", "sm-arrow-down") %>
+        <%= heroicons_preview("solid-sm", "sm-check") %>
+        <%= heroicons_preview("solid-sm", "sm-plus-circle") %>
+        <%= heroicons_preview("outline-md", "md-arrow-down") %>
+        <%= heroicons_preview("outline-md", "md-check") %>
+        <%= heroicons_preview("outline-md", "md-plus-circle") %>
+      </div>
 
-      <svg
-        height="800" viewBox="0 0 <%= @state.size + 100 %> <%= @state.size %>"
-        xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-      >
-        <g id="grid">
-          <%= for x <- 1..max_x do %>
-            <%= for y <- 1..max_y do %>
-              <rect
-                x="<%= x - 1 %>"
-                y="<%= y - 1 %>"
-                width="1"
-                height="1"
-                fill="transparent"
-                stroke="#ddd"
-                stroke-width="0.05"
-              />
-            <% end %>
-          <% end %>
-        </g>
-
-        <g id="main">
-          <%= for x <- 1..max_x do %>
-            <%= for y <- 1..max_y do %>
-              <%= render_x_y(@state, x, y) %>
-            <% end %>
-          <% end %>
-        </g>
-
-        <use xlink:href="#main" transform="translate(<%= @state.size + 1 %> 0) scale(0.25 0.25)" />
-      </svg>
+      <div class="mb-4">
+        <%= render_cells("state1", @state1.cells, @state1) %>
+      </div>
+      <div class="mb-4">
+        <%= render_cells("state2", @state2.cells, @state2) %>
+      </div>
     </div>
     """
   end
