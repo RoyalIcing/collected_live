@@ -42,7 +42,11 @@ defmodule CollectedLiveWeb.ShapedLive do
         {{12, 3}, {:diagonal, :se, arc: true}},
         {{13, 3}, {:diagonal, :sw, arc: true}},
         {{12, 22}, {:diagonal, :ne, we: true}},
-        {{13, 22}, {:diagonal, :nw, we: true}}
+        {{13, 22}, {:diagonal, :nw, we: true}},
+        {{4, 13}, {:diagonal, :se, ns: true}},
+        {{4, 14}, {:diagonal, :ne, ns: true}},
+        {{21, 13}, {:diagonal, :sw, ns: true}},
+        {{21, 14}, {:diagonal, :nw, ns: true}}
       ]
 
       pairs = [diagonals, vertical_stem, caps] |> List.flatten()
@@ -70,15 +74,6 @@ defmodule CollectedLiveWeb.ShapedLive do
     {:ok, assign(socket, state: state)}
   end
 
-  defp fill_at_x_y(state = %State{}, x, y) do
-    cell = State.at_x_y(state, x, y)
-
-    case cell do
-      :whole -> state.base_color
-      _ -> "transparent"
-    end
-  end
-
   defp render_x_y(state = %State{}, x, y) do
     state |> State.at_x_y(x, y) |> render_x_y(state, x, y)
   end
@@ -94,46 +89,75 @@ defmodule CollectedLiveWeb.ShapedLive do
   end
 
   defmodule Diagonal do
-    defstruct direction: :ne, we: false, arc: false
+    defstruct direction: :ne, ns: false, we: false, arc: false
 
     def from_tuple({:diagonal, direction, options}) do
       %Diagonal{
         direction: direction,
+        ns: Keyword.get(options, :ns, false),
         we: Keyword.get(options, :we, false),
         arc: Keyword.get(options, :arc, false)
       }
     end
 
-    def to_svg_element(%Diagonal{direction: :ne, we: we}, x, y, fill) do
-      case we do
-        false ->
-          content_tag(:polygon, "",
-            points: "#{x - 1},#{y - 1} #{x},#{y - 1} #{x},#{y}",
-            fill: fill
-          )
+    defp d_command_to_s({:m, {x, y}}), do: "m#{x},#{y}"
+    defp d_command_to_s({:l, {x, y}}), do: "l#{x},#{y}"
+    defp d_command_to_s({:q, {{dx1, dy1}, {dx, dy}}}), do: "q#{dx1},#{dy1} #{dx},#{dy}"
 
-        true ->
-          content_tag(:path, "",
-            d: "M#{x - 1},#{y - 1} q0.5,0.5 1,0.5 l0,-0.5",
-            fill: fill
-          )
-      end
+    defp d_to_s(commands) do
+      commands |> Enum.map(&d_command_to_s/1) |> Enum.join(" ")
     end
 
-    def to_svg_element(%Diagonal{direction: :nw, we: we}, x, y, fill) do
-      case we do
-        false ->
-          content_tag(:polygon, "",
-            points: "#{x - 1},#{y - 1} #{x - 1},#{y} #{x},#{y - 1}",
-            fill: fill
-          )
+    # defp d_command_flip_x({type, {x, y}}) when type in [:m, :l], do: {type, {1-x, y}}
+    # defp d_command_flip_x({:q, {{dx1, dy1}, {dx, dy}}}), do: {:q, {{1-dx1, dy1}, {1-dx, dy}}}
 
-        true ->
-          content_tag(:path, "",
-            d: "M#{x},#{y - 1} q-0.5,0.5 -1,0.5 l0,-0.5",
-            fill: fill
-          )
-      end
+    # defp d_flip_x(commands) do
+    #   commands |> Enum.map(&d_command_flip_x/1)
+    # end
+
+    @ne_ns_commands [m: {0.5, 0}, q: {{0, 0.5}, {0.5, 1}}, l: {0, -1}]
+    @nw_ns_commands [m: {0.5, 0}, q: {{0, 0.5}, {-0.5, 1}}, l: {0, -1}]
+    @se_ns_commands [m: {0.5, 1}, q: {{0, -0.5}, {0.5, -1}}, l: {0, 1}]
+    @sw_ns_commands [m: {0.5, 1}, q: {{0, -0.5}, {-0.5, -1}}, l: {0, 1}]
+
+    defp ns_path_d(:ne, x, y), do: "M#{x - 1},#{y - 1} #{@ne_ns_commands |> d_to_s}"
+    defp ns_path_d(:nw, x, y), do: "M#{x - 1},#{y - 1} #{@nw_ns_commands |> d_to_s}"
+    defp ns_path_d(:se, x, y), do: "M#{x - 1},#{y - 1} #{@se_ns_commands |> d_to_s}"
+    defp ns_path_d(:sw, x, y), do: "M#{x - 1},#{y - 1} #{@sw_ns_commands |> d_to_s}"
+
+    def to_svg_element(%Diagonal{direction: direction, ns: true}, x, y, fill) do
+      content_tag(:path, "",
+        d: ns_path_d(direction, x, y),
+        fill: fill
+      )
+    end
+
+    def to_svg_element(%Diagonal{direction: :ne, we: true}, x, y, fill) do
+      content_tag(:path, "",
+        d: "M#{x - 1},#{y - 1} q0.5,0.5 1,0.5 l0,-0.5",
+        fill: fill
+      )
+    end
+
+    def to_svg_element(%Diagonal{direction: :ne}, x, y, fill) do
+      content_tag(:polygon, "",
+        points: "#{x - 1},#{y - 1} #{x},#{y - 1} #{x},#{y}",
+        fill: fill
+      )
+    end
+
+    def to_svg_element(%Diagonal{direction: :nw, we: true}, x, y, fill) do
+      content_tag(:path, "",
+        d: "M#{x},#{y - 1} q-0.5,0.5 -1,0.5 l0,-0.5",
+        fill: fill
+      )
+    end
+
+    def to_svg_element(%Diagonal{direction: :nw}, x, y, fill) do
+      content_tag(:polygon, "",
+        points: "#{x - 1},#{y - 1} #{x - 1},#{y} #{x},#{y - 1}",
+        fill: fill
+      )
     end
 
     def to_svg_element(%Diagonal{direction: :sw, arc: arc}, x, y, fill) do
@@ -188,40 +212,88 @@ defmodule CollectedLiveWeb.ShapedLive do
     )
   end
 
+  defp heroicons_preview("solid-sm" = group, name) do
+    assigns = %{}
+
+    ~L"""
+    <div class="relative mb-4">
+      <img
+        src="<%= heroicons_svg_url(group, name) %>"
+        alt=""
+        width="800"
+        class="top-0"
+        style="border: 2px solid black"
+      >
+      <svg
+        width="800" height="800" viewBox="0 0 20 20"
+        xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+        class="absolute z-10 top-0"
+      >
+        <%= for x <- 1..20 do %>
+          <%= for y <- 1..20 do %>
+            <rect
+              x="<%= x - 1 %>"
+              y="<%= y - 1 %>"
+              width="1"
+              height="1"
+              fill="transparent"
+              stroke="#ddd"
+              stroke-width="0.05"
+            />
+          <% end %>
+        <% end %>
+      </svg>
+    </div>
+    """
+  end
+
+  defp heroicons_preview("outline-md" = group, name) do
+    assigns = %{}
+
+    ~L"""
+    <div class="relative mb-4">
+      <img
+        src="<%= heroicons_svg_url(group, name) %>"
+        alt=""
+        width="800"
+        class="top-0"
+        style="border: 2px solid black"
+      >
+      <svg
+        width="800" height="800" viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+        class="absolute z-10 top-0"
+      >
+        <%= for x <- 1..24 do %>
+          <%= for y <- 1..24 do %>
+            <rect
+              x="<%= x - 1 %>"
+              y="<%= y - 1 %>"
+              width="1"
+              height="1"
+              fill="transparent"
+              stroke="#ddd"
+              stroke-width="0.05"
+            />
+          <% end %>
+        <% end %>
+      </svg>
+    </div>
+    """
+  end
+
   def render(assigns) do
     max_x = assigns.state.size + 1
     max_y = assigns.state.size + 1
 
     ~L"""
     <div class="max-w-4xl mx-auto text-center">
-      <div class="relative mb-4">
-        <img
-          src="<%= heroicons_svg_url("solid-sm", "sm-arrow-down") %>"
-          alt=""
-          width="800"
-          class="top-0"
-          style="border: 2px solid black"
-        >
-        <svg
-          width="800" height="800" viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-          class="absolute z-10 top-0"
-        >
-          <%= for x <- 1..24 do %>
-            <%= for y <- 1..24 do %>
-              <rect
-                x="<%= x - 1 %>"
-                y="<%= y - 1 %>"
-                width="1"
-                height="1"
-                fill="transparent"
-                stroke="#ddd"
-                stroke-width="0.05"
-              />
-            <% end %>
-          <% end %>
-        </svg>
-      </div>
+      <%= heroicons_preview("solid-sm", "sm-arrow-down") %>
+      <%= heroicons_preview("solid-sm", "sm-check") %>
+      <%= heroicons_preview("solid-sm", "sm-plus-circle") %>
+      <%= heroicons_preview("outline-md", "md-arrow-down") %>
+      <%= heroicons_preview("outline-md", "md-check") %>
+      <%= heroicons_preview("outline-md", "md-plus-circle") %>
 
       <svg
         height="800" viewBox="0 0 <%= @state.size + 100 %> <%= @state.size %>"
