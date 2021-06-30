@@ -15,6 +15,11 @@ defmodule CollectedLiveWeb.ShapedLive do
     defstruct size: 24, base_color: "#372849", primitives: [], cells: %{}
 
     def make_plus_circle_24() do
+      # The url for this might end up being
+      # GraphQL inspired:
+      # collected.systems/shaped/1/{circle(r:9,stroke:2),plus(r:3,stroke:2)}.svg
+      # Something else:
+      # collected.systems/shaped/1/[circle:{9,stroke:2},plus:{3,stroke:2}].svg
       primitives = [
         {:circle, 9, {12, 12}, %{stroke: %{width: 2}}},
         {:plus, 3, {12, 12}, %{stroke: %{width: 2}}}
