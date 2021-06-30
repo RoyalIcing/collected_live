@@ -7,6 +7,6 @@ defmodule CollectedLiveWeb.CodeSearchController do
   end
 
   def index(conn, _params) do
-    index(conn, %{"owner" => "facebook", "repo" => "react", "release" => "v16.11.0"})
+    index(conn, %{"owner" => "facebook", "repo" => "react", "release" => "v17.0.2"})
   end
 end

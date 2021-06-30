@@ -6,7 +6,7 @@ defmodule CollectedLiveWeb.ZipLive do
   alias CollectedLive.GitHubArchiveDownloader
   alias CollectedLive.Content.Archive
 
-  @default_params %{"owner" => "facebook", "repo" => "react", "release" => "v16.11.0"}
+  @default_params %{"owner" => "facebook", "repo" => "react", "release" => "v17.0.2"}
 
   defp pluralize(count, thing) when is_integer(count) and is_binary(thing) do
     "#{count} #{Inflex.inflect(thing, count)}"
